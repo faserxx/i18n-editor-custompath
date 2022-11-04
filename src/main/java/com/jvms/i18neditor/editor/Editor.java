@@ -118,6 +118,7 @@ public class Editor extends JFrame {
 	
 	public void createProject(Path dir, ResourceType type) {
 		try {
+			//Verify if exist directory
 			Preconditions.checkArgument(Files.isDirectory(dir));
 			
 			if (!closeCurrentProject()) {
