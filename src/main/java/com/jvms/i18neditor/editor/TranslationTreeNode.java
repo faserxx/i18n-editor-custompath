@@ -32,76 +32,30 @@ public class TranslationTreeNode extends DefaultMutableTreeNode {
         Dialogs.showErrorDialog(null, MessageBundle.get("dialogs.error.title"), message);
     }
 
-private void doJSonAnalisis(EditorProject project,Editor editor,File dir) {
-    Optional<ResourceType> type = Optional.ofNullable(project.getResourceType());
-    List<Resource> resourceList = null;
-    try {
-        resourceList = Resources.get(dir.toPath(),
-                project.getResourceFileDefinition(), project.getResourceFileStructure(), type);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    Map<String,String> keys = Maps.newTreeMap();
 
 
-        resourceList.forEach(resource -> {
-            try {
-                Resources.load(resource);
-                editor.setupResource(resource);
-                project.addResource(resource);
-
-            } catch (IOException e) {
-                log.error("Error importing resource file " + resource.getPath(), e);
-                showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
-            }
-        });
-
-        project.getResources().forEach(r -> keys.putAll(r.getTranslations()));
-
-    add(new TranslationTreeNode(dir.getParentFile().getName(), Lists.newArrayList(keys.keySet())));
-
-
-}
-    private void scan(File node,EditorProject project,Editor editor) {
-
-        if (node.isDirectory()) {
-
-            for (File child : node.listFiles()) {
-                if (child.isDirectory() && child.getName().equals("i18n")) {
-                    doJSonAnalisis(project,editor,child);
-
-                } else {
-                    if (!child.isDirectory() && !child.getName().equals(".i18n-editor-metadata")  && !Utils.getExtension(child).equals("json") ) {
-
-                       showError(  MessageBundle.get("dialogs.notvalid.folderstructure", child.getAbsolutePath()));
-                       break;
-                    } else if (!child.getName().equals(".i18n-editor-metadata")){
-                        add(new TranslationTreeNode(project,editor,child, TypeFile.FOLDER));
-                    }
-
-                }
-            }
-        }
-
-    }
-
-    public TranslationTreeNode(EditorProject project,Editor editor,File dir, TypeFile typeFile) {
-        name = dir.getName();
+public  TranslationTreeNode(String name,TypeFile typeFile){
         this.typeFile = typeFile;
-        scan(dir,project,editor);
+        this.name = name;
+}
 
+    public TranslationTreeNode(String name, List<String> keys,TypeFile typeFile) {
+        super();
+        this.name = name;
+       this.typeFile = typeFile;
+        ResourceKeys.uniqueRootKeys(keys).forEach(rootKey -> {
+            List<String> subKeys = ResourceKeys.extractChildKeys(keys, rootKey);
 
-//		super();
-//		this.name = name;
-//		ResourceKeys.uniqueRootKeys(keys).forEach(rootKey -> {
-//			List<String> subKeys = ResourceKeys.extractChildKeys(keys, rootKey);
-//			add(new TranslationTreeNode(rootKey, subKeys));
-//		});
+            add(new TranslationTreeNode(rootKey, subKeys));
+        });
     }
-
     public TranslationTreeNode(String name, List<String> keys) {
         super();
         this.name = name;
+        if(ResourceKeys.uniqueRootKeys(keys).size() == 0){
+            this.typeFile = TypeFile.ELEMENT;
+        }
+
         ResourceKeys.uniqueRootKeys(keys).forEach(rootKey -> {
             List<String> subKeys = ResourceKeys.extractChildKeys(keys, rootKey);
 

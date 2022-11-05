@@ -21,7 +21,7 @@ import com.jvms.i18neditor.util.MessageBundle;
  */
 public abstract class AbstractSettingsPane extends JPanel {
 	private final static long serialVersionUID = -8953194193840198893L;
-	private GridBagConstraints vGridBagConstraints;
+	private final GridBagConstraints vGridBagConstraints;
 	
 	protected final List<ComboBoxFileStructure> fileStructureComboBoxItems = Lists.newArrayList(FileStructure.values()).stream()
 			.map(val -> new ComboBoxFileStructure(val, MessageBundle.get("settings.filestructure." + val.name().toLowerCase())))
@@ -56,8 +56,8 @@ public abstract class AbstractSettingsPane extends JPanel {
 	}
 	
 	protected class ComboBoxFileStructure implements Comparable<ComboBoxFileStructure> {
-		private FileStructure structure;
-		private String label;
+		private final FileStructure structure;
+		private final String label;
 		
 		public ComboBoxFileStructure(FileStructure structure, String label) {
 			this.structure = structure;
@@ -79,7 +79,7 @@ public abstract class AbstractSettingsPane extends JPanel {
 	}
 	
 	protected class ComboBoxLocale implements Comparable<ComboBoxLocale> {
-		private Locale locale;
+		private final Locale locale;
 		
 		public ComboBoxLocale(Locale locale) {
 			this.locale = locale;

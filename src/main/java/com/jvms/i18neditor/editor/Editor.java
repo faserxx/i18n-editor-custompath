@@ -20,11 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,6 +48,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
+import com.jvms.i18neditor.util.*;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +56,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jvms.i18neditor.FileStructure;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
@@ -67,15 +63,7 @@ import com.jvms.i18neditor.io.ChecksumException;
 import com.jvms.i18neditor.swing.JFileDrop;
 import com.jvms.i18neditor.swing.JScrollablePanel;
 import com.jvms.i18neditor.swing.util.Dialogs;
-import com.jvms.i18neditor.util.Colors;
-import com.jvms.i18neditor.util.ExtendedProperties;
-import com.jvms.i18neditor.util.GithubRepoUtil;
 import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
-import com.jvms.i18neditor.util.Images;
-import com.jvms.i18neditor.util.Locales;
-import com.jvms.i18neditor.util.MessageBundle;
-import com.jvms.i18neditor.util.ResourceKeys;
-import com.jvms.i18neditor.util.Resources;
 
 /**
  * This class represents the main class of the editor.
@@ -102,8 +90,8 @@ public class Editor extends JFrame {
             new Locale("es", "ES"));
 
     private EditorProject project;
-    private EditorSettings settings = new EditorSettings();
-    private ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final EditorSettings settings = new EditorSettings();
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private boolean dirty;
 
     private EditorMenuBar editorMenu;
@@ -114,7 +102,7 @@ public class Editor extends JFrame {
     private TranslationTree translationTree;
     private TranslationKeyField translationField;
     private JPanel resourcesPanel;
-    private List<ResourceField> resourceFields = Lists.newArrayList();
+    private Set<ResourceField> resourceFields = new HashSet<>();
 
     public void createProject(Path dir, ResourceType type) {
         try {
@@ -133,7 +121,7 @@ public class Editor extends JFrame {
                         MessageBundle.get("dialogs.project.new.conflict.text"),
                         JOptionPane.YES_NO_OPTION);
                 if (importProject) {
-                    importProject(dir, false);
+                    importProject(dir);
                     return;
                 }
             }
@@ -162,25 +150,28 @@ public class Editor extends JFrame {
         }
     }
 
-    public void importProject(Path dir, boolean showEmptyProjectError) {
+    public void importProject(Path dir) {
+        //Check if exist the directory
+        Preconditions.checkArgument(Files.isDirectory(dir));
 
-            Preconditions.checkArgument(Files.isDirectory(dir));
+        if (!closeCurrentProject()) {
+            return;
+        }
 
-            if (!closeCurrentProject()) {
-                return;
-            }
+        clearUI();
+        project = new EditorProject(dir);
+        restoreProjectState(project);
+        //Create the Nodes with the folder structure
+        TranslationTreeNode translationTreeNode = Utils.createTreeByDir(project, this, dir.toFile());
 
-            clearUI();
-            project = new EditorProject(dir);
-            restoreProjectState(project);
-
-
-            translationTree.setModel(new TranslationTreeModel(project,this,dir));
-
-            updateTreeNodeStatuses();
-            updateHistory();
-            updateUI();
-            requestFocusInFirstResourceField();
+        //if it is null it means that some error occurred and it is not necessary to rebuild the ui
+        if (translationTreeNode != null) {
+            translationTree.setModel(new TranslationTreeModel(translationTreeNode));
+        }
+        updateTreeNodeStatuses();
+        updateHistory();
+        updateUI();
+        requestFocusInFirstResourceField();
 
 
     }
@@ -202,7 +193,7 @@ public class Editor extends JFrame {
 
     public void reloadProject() {
         if (project != null) {
-            importProject(project.getPath(), true);
+            importProject(project.getPath());
         }
     }
 
@@ -389,7 +380,7 @@ public class Editor extends JFrame {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = fc.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-            importProject(Paths.get(fc.getSelectedFile().getPath()), true);
+            importProject(Paths.get(fc.getSelectedFile().getPath()));
         }
     }
 
@@ -572,10 +563,10 @@ public class Editor extends JFrame {
 
         List<String> dirs = settings.getHistory();
         if (!dirs.isEmpty()) {
-            String lastDir = dirs.get(dirs.size()-1);
+            String lastDir = dirs.get(dirs.size() - 1);
             Path path = Paths.get(lastDir);
             if (Files.exists(path)) {
-                importProject(path, false);
+                importProject(path);
             }
         }
 
@@ -607,7 +598,7 @@ public class Editor extends JFrame {
         TranslationTreeNode selectedNode = translationTree.getSelectionNode();
 
         resourcesPanel.removeAll();
-        resourceFields = resourceFields.stream().sorted().collect(Collectors.toList());
+        resourceFields = resourceFields.stream().sorted().collect(Collectors.toCollection(LinkedHashSet::new));
         resourceFields.forEach(field -> {
             Locale locale = field.getResource().getLocale();
             String label = locale != null ? locale.getDisplayName() : MessageBundle.get("resources.locale.default");
@@ -652,7 +643,7 @@ public class Editor extends JFrame {
             boolean isReplace = newNode.isLeaf() || oldNode.isLeaf();
             boolean confirm = Dialogs.showConfirmDialog(this,
                     MessageBundle.get("dialogs.translation.conflict.title"),
-                    MessageBundle.get("dialogs.translation.conflict.text." + (isReplace?"replace":"merge")),
+                    MessageBundle.get("dialogs.translation.conflict.text." + (isReplace ? "replace" : "merge")),
                     JOptionPane.WARNING_MESSAGE);
             if (!confirm) {
                 return false;
@@ -705,25 +696,25 @@ public class Editor extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new EditorWindowListener());
 
-        setIconImages(Lists.newArrayList("512","256","128","64","48","32","24","20","16").stream()
+        setIconImages(Lists.newArrayList("512", "256", "128", "64", "48", "32", "24", "20", "16").stream()
                 .map(size -> Images.loadFromClasspath("images/icon-" + size + ".png").getImage())
                 .collect(Collectors.toList()));
 
         translationTree = new TranslationTree();
-        translationTree.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+        translationTree.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         translationTree.addTreeSelectionListener(new TranslationTreeNodeSelectionListener());
         translationTree.addMouseListener(new TranslationTreeMouseListener());
 
         translationField = new TranslationKeyField();
         translationField.addKeyListener(new TranslationFieldKeyListener());
         translationField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1,0,0,1,borderColor),
-                ((CompoundBorder)translationField.getBorder()).getInsideBorder()));
+                BorderFactory.createMatteBorder(1, 0, 0, 1, borderColor),
+                ((CompoundBorder) translationField.getBorder()).getInsideBorder()));
 
         JScrollPane translationsScrollPane = new JScrollPane(translationTree);
         translationsScrollPane.getViewport().setOpaque(false);
         translationsScrollPane.setOpaque(false);
-        translationsScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,1,borderColor));
+        translationsScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
 
         translationsPanel = new JPanel(new BorderLayout());
         translationsPanel.add(translationsScrollPane);
@@ -731,7 +722,7 @@ public class Editor extends JFrame {
 
         resourcesPanel = new JScrollablePanel(true, false);
         resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
-        resourcesPanel.setBorder(BorderFactory.createEmptyBorder(10,20,10,20));
+        resourcesPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         resourcesPanel.setOpaque(false);
         resourcesPanel.addMouseListener(new ResourcesPaneMouseListener());
 
@@ -748,9 +739,9 @@ public class Editor extends JFrame {
         // Style the split pane divider if possible
         SplitPaneUI splitPaneUI = contentPane.getUI();
         if (splitPaneUI instanceof BasicSplitPaneUI) {
-            BasicSplitPaneDivider divider = ((BasicSplitPaneUI)splitPaneUI).getDivider();
+            BasicSplitPaneDivider divider = ((BasicSplitPaneUI) splitPaneUI).getDivider();
             divider.setBorder(null);
-            resourcesPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
+            resourcesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 20));
         }
 
         introText = new JLabel("<html><body style=\"text-align:center; padding:30px;\">" +
@@ -777,7 +768,7 @@ public class Editor extends JFrame {
             public void filesDropped(java.io.File[] files) {
                 try {
                     Path path = Paths.get(files[0].getCanonicalPath());
-                    importProject(path, true);
+                    importProject(path);
                 } catch (IOException e) {
                     log.error("Error importing resources via file drop", e);
                     showError(MessageBundle.get("resources.open.error.multiple"));
@@ -815,14 +806,14 @@ public class Editor extends JFrame {
                     result = true;
                     break;
                 case KeyEvent.VK_UP:
-                    TreePath prev = translationTree.getPathForRow(Math.max(0, row-1));
+                    TreePath prev = translationTree.getPathForRow(Math.max(0, row - 1));
                     if (prev != null) {
                         translationTree.setSelectionPath(prev);
                     }
                     result = true;
                     break;
                 case KeyEvent.VK_DOWN:
-                    TreePath next = translationTree.getPathForRow(row+1);
+                    TreePath next = translationTree.getPathForRow(row + 1);
                     if (next != null) {
                         translationTree.setSelectionPath(next);
                     }
@@ -921,7 +912,7 @@ public class Editor extends JFrame {
         ExtendedProperties props = new ExtendedProperties();
         props.setProperty("minify_resources", project.isMinifyResources());
         props.setProperty("flatten_json", project.isFlattenJSON());
-        props.setProperty("resource_type", project.getResourceType().toString());
+        props.setProperty("resource_type", ResourceType.JSON);
         props.setProperty("resource_definition", project.getResourceFileDefinition());
         props.setProperty("resource_structure", project.getResourceFileStructure());
         props.store(Paths.get(project.getPath().toString(), PROJECT_FILE));

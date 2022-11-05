@@ -31,7 +31,7 @@ public class ResourceField extends JTextArea implements Comparable<ResourceField
 	}
 	
 	public void setValue(String key) {
-
+		System.out.println(key);
 		setText(resource.getTranslation(key));
 		undoManager.discardAllEdits();
 	}

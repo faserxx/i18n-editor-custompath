@@ -23,12 +23,14 @@ public class TranslationTreeModel extends DefaultTreeModel {
 		super(new TranslationTreeNode(MessageBundle.get("tree.root.name"), Lists.newArrayList()));
 	}
 
-	public TranslationTreeModel(EditorProject project,Editor editor,Path dir) {
-		super(new TranslationTreeNode(project,editor,dir.toFile(), TypeFile.FOLDER));
-	}
+
 	public TranslationTreeModel(List<String> keys) {
 		super(new TranslationTreeNode(MessageBundle.get("tree.root.name"), keys));
 	}
+	public TranslationTreeModel(TranslationTreeNode node){
+		super(node);
+	}
+
 	
 	public Enumeration<TranslationTreeNode> getEnumeration() {
 		return getEnumeration((TranslationTreeNode) getRoot());

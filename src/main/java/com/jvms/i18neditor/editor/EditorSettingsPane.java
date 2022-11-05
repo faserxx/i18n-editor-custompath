@@ -25,7 +25,7 @@ import com.jvms.i18neditor.util.MessageBundle;
  */
 public class EditorSettingsPane extends AbstractSettingsPane {
 	private final static long serialVersionUID = 4488173853564278813L;
-	private Editor editor;
+	private final Editor editor;
 	
 	public EditorSettingsPane(Editor editor) {
 		super();

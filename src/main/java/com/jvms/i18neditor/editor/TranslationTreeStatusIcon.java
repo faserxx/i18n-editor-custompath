@@ -20,7 +20,7 @@ public class TranslationTreeStatusIcon implements Icon {
 	public enum StatusIconType {
     	Warning(new Color(220,160,0));
     	
-    	private Color color;
+    	private final Color color;
     	
     	public Color getColor() {
     		return color;

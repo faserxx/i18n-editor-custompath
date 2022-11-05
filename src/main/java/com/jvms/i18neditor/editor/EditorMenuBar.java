@@ -102,7 +102,7 @@ public class EditorMenuBar extends JMenuBar {
      			Integer n = i + 1;
      			JMenuItem menuItem = new JMenuItem(n + ": " + items.get(i), Character.forDigit(i, 10));
      			Path path = Paths.get(menuItem.getText().replaceFirst("[0-9]+: ",""));
-     			menuItem.addActionListener(e -> editor.importProject(path, true));
+     			menuItem.addActionListener(e -> editor.importProject(path));
      			openRecentMenuItem.add(menuItem);
      		}
      		JMenuItem clearMenuItem = new JMenuItem(MessageBundle.get("menu.file.recent.clear.title"));

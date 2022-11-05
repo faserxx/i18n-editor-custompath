@@ -18,8 +18,8 @@ import com.jvms.i18neditor.editor.TranslationTreeToggleIcon.ToggleIconType;
  * @author Jacob van Mourik
  */
 public class TranslationTreeUI extends BasicTreeUI {
-	private TranslationTreeToggleIcon expandedIcon = new TranslationTreeToggleIcon(ToggleIconType.Expanded);
-	private TranslationTreeToggleIcon collapsedIcon = new TranslationTreeToggleIcon(ToggleIconType.Collapsed);
+	private final TranslationTreeToggleIcon expandedIcon = new TranslationTreeToggleIcon(ToggleIconType.Expanded);
+	private final TranslationTreeToggleIcon collapsedIcon = new TranslationTreeToggleIcon(ToggleIconType.Collapsed);
 	
 	@Override
 	protected void toggleExpandState(TreePath path) {
