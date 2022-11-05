@@ -19,7 +19,7 @@ import com.jvms.i18neditor.swing.JTextArea;
 public class ResourceField extends JTextArea implements Comparable<ResourceField> {
 	private final static long serialVersionUID = 2034814490878477055L;
 	private final Resource resource;
-	
+
 	public ResourceField(Resource resource) {
 		super();
 		this.resource = resource;
@@ -31,6 +31,7 @@ public class ResourceField extends JTextArea implements Comparable<ResourceField
 	}
 	
 	public void setValue(String key) {
+
 		setText(resource.getTranslation(key));
 		undoManager.discardAllEdits();
 	}

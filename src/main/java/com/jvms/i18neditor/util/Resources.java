@@ -157,6 +157,7 @@ public final class Resources {
 	 * @throws 	IOException if an I/O error occurs writing the file.
 	 */
 	public static void write(Resource resource, boolean prettyPrinting, boolean flattenKeys) throws IOException {
+		System.out.println(resource.getPath());
 		if (resource.getChecksum() != null) {
 			String checksum = createChecksum(resource);
 			if (!checksum.equals(resource.getChecksum())) {

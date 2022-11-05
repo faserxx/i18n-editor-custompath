@@ -1,5 +1,6 @@
 package com.jvms.i18neditor.editor;
 
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.swing.tree.DefaultTreeModel;
 import com.google.common.collect.Lists;
 import com.jvms.i18neditor.util.MessageBundle;
 import com.jvms.i18neditor.util.ResourceKeys;
+import com.jvms.i18neditor.util.TypeFile;
 
 /**
  * This class represents a model for the translation tree.
@@ -20,7 +22,10 @@ public class TranslationTreeModel extends DefaultTreeModel {
 	public TranslationTreeModel() {
 		super(new TranslationTreeNode(MessageBundle.get("tree.root.name"), Lists.newArrayList()));
 	}
-	
+
+	public TranslationTreeModel(EditorProject project,Editor editor,Path dir) {
+		super(new TranslationTreeNode(project,editor,dir.toFile(), TypeFile.FOLDER));
+	}
 	public TranslationTreeModel(List<String> keys) {
 		super(new TranslationTreeNode(MessageBundle.get("tree.root.name"), keys));
 	}
@@ -39,7 +44,7 @@ public class TranslationTreeModel extends DefaultTreeModel {
 	    while (e.hasMoreElements()) {
 	    	TranslationTreeNode n = e.nextElement();
 	        if (n.getKey().equals(key)) {
-	            return n;
+			            return n;
 	        }
 	    }
 	    return null;
