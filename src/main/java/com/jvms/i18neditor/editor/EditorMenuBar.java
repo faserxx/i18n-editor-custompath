@@ -17,15 +17,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.editor.menu.AddLocaleMenuItem;
-import com.jvms.i18neditor.editor.menu.AddTranslationMenuItem;
-import com.jvms.i18neditor.editor.menu.CollapseTranslationsMenuItem;
-import com.jvms.i18neditor.editor.menu.CopyTranslationKeyToClipboardMenuItem;
-import com.jvms.i18neditor.editor.menu.DuplicateTranslationMenuItem;
-import com.jvms.i18neditor.editor.menu.ExpandTranslationsMenuItem;
-import com.jvms.i18neditor.editor.menu.FindTranslationMenuItem;
-import com.jvms.i18neditor.editor.menu.RemoveTranslationMenuItem;
-import com.jvms.i18neditor.editor.menu.RenameTranslationMenuItem;
+import com.jvms.i18neditor.editor.menu.*;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import com.jvms.i18neditor.util.GithubRepoUtil;
 import com.jvms.i18neditor.util.MessageBundle;
@@ -48,6 +40,7 @@ public class EditorMenuBar extends JMenuBar {
 	private JMenuItem copyTranslationKeyMenuItem;
 	private JMenuItem duplicateTranslationMenuItem;
 	private JMenuItem removeTranslationMenuItem;
+	private JMenuItem changePathFolderProjectMenuItem;
 	private JMenuItem openContainingFolderMenuItem;
 	private JMenuItem projectSettingsMenuItem;
 	private JMenuItem editorSettingsMenuItem;
@@ -90,6 +83,7 @@ public class EditorMenuBar extends JMenuBar {
 	public void setEditable(boolean editable) {
 		addTranslationMenuItem.setEnabled(editable);
 		findTranslationMenuItem.setEnabled(editable);
+		changePathFolderProjectMenuItem.setEnabled(editable);
 	}
 	
 	public void setRecentItems(List<String> items) {
@@ -179,6 +173,7 @@ public class EditorMenuBar extends JMenuBar {
         duplicateTranslationMenuItem = new DuplicateTranslationMenuItem(editor, true);
         renameTranslationMenuItem = new RenameTranslationMenuItem(editor, false);
         copyTranslationKeyMenuItem = new CopyTranslationKeyToClipboardMenuItem(editor, false);
+        changePathFolderProjectMenuItem = new ChangePathFolderProjectMenuItem(editor, false);
         
         editMenu.add(new AddLocaleMenuItem(editor, true));
         editMenu.addSeparator();
@@ -189,7 +184,9 @@ public class EditorMenuBar extends JMenuBar {
         editMenu.add(duplicateTranslationMenuItem);
         editMenu.add(removeTranslationMenuItem);
         editMenu.add(copyTranslationKeyMenuItem);
-        
+		editMenu.addSeparator();
+		editMenu.add(changePathFolderProjectMenuItem);
+
         // View menu
         viewMenu = new JMenu(MessageBundle.get("menu.view.title"));
         viewMenu.setMnemonic(MessageBundle.getMnemonic("menu.view.vk"));

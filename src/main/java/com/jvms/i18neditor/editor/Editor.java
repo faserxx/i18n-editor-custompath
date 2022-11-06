@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,6 +53,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,6 +250,31 @@ public class Editor extends JFrame {
 		TranslationTreeNode node = translationTree.getSelectionNode();
 		if (node != null && !node.isRoot()) {
 			showRenameTranslationDialog(node.getKey());
+		}
+	}
+
+	public void changePathFolder() {
+		int confirm = JOptionPane.showConfirmDialog(this,
+				MessageBundle.get("dialogs.change.path.text"),
+				MessageBundle.get("dialogs.change.path.title"),
+				JOptionPane.YES_NO_OPTION);
+		if (confirm == JOptionPane.YES_OPTION) {
+			JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle(MessageBundle.get("dialogs.project.change.path.title"));
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int result = fc.showOpenDialog(this);
+			String pathOld = project.getPath().toString();
+			if (result == JFileChooser.APPROVE_OPTION) {
+				try {
+					FileUtils.cleanDirectory(new File(fc.getSelectedFile().getPath()));
+					FileUtils.copyDirectory(new File(pathOld), new File(fc.getSelectedFile().getPath()));
+					importProject(Paths.get(fc.getSelectedFile().getPath()), true);
+					FileUtils.forceDelete(new File(pathOld));
+				} catch (IOException e) {
+					log.error("Error importing resources via file drop", e);
+					showError(MessageBundle.get("resources.change.path.error"));
+				}
+			}
 		}
 	}
 	
