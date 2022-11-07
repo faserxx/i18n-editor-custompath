@@ -270,7 +270,11 @@ public class Editor extends JFrame {
 					FileUtils.copyDirectory(new File(pathOld), new File(fc.getSelectedFile().getPath()));
 					importProject(Paths.get(fc.getSelectedFile().getPath()), true);
 					FileUtils.forceDelete(new File(pathOld));
-                    JOptionPane.showMessageDialog(this,MessageBundle.get("dialogs.change.success"));
+                    JOptionPane.showMessageDialog(this,
+							MessageBundle.get("dialogs.change.success"),
+							MessageBundle.get("dialogs.change.title"),
+							JOptionPane.YES_OPTION);
+
 				} catch (IOException e) {
 					log.error("Error importing resources via file drop", e);
 					showError(MessageBundle.get("resources.change.path.error"));
@@ -326,7 +330,10 @@ public class Editor extends JFrame {
 		TranslationTreeNode node = translationTree.getNodeByKey(key);
 		if (node != null) {
 			//translationTree.setSelectionNode(node);
-			JOptionPane.showMessageDialog(this,MessageBundle.get("dialogs.create.branch"));
+			JOptionPane.showMessageDialog(this,
+					MessageBundle.get("dialogs.create.branch"),
+					MessageBundle.get("dialogs.branch.title"),
+					JOptionPane.YES_OPTION);
 			return false;
 		} else if (!confirmNewTranslation(key)) {
 			return false;
