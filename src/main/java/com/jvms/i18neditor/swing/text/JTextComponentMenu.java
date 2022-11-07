@@ -22,12 +22,12 @@ import com.jvms.i18neditor.util.MessageBundle;
  */
 public class JTextComponentMenu extends JPopupMenu {
 	private final static long serialVersionUID = 5967213965940023534L;
-	private JTextComponent parent;
-	private UndoManager undoManager;
-	private Action cutAction;
-	private Action copyAction;
-	private Action deleteAction;
-	private Action undoAction;
+	private final JTextComponent parent;
+	private final UndoManager undoManager;
+	private final Action cutAction;
+	private final Action copyAction;
+	private final Action deleteAction;
+	private final Action undoAction;
 	
 	public JTextComponentMenu(JTextComponent parent, UndoManager undoManager) {
 		super();

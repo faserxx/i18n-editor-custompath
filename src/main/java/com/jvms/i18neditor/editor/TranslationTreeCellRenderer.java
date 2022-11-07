@@ -3,6 +3,8 @@ package com.jvms.i18neditor.editor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -10,8 +12,8 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import com.jvms.i18neditor.editor.TranslationTreeStatusIcon.StatusIconType;
 import com.jvms.i18neditor.util.Images;
+import com.jvms.i18neditor.util.TypeFile;
 
 /**
  * This class represents a default cell renderer for the translation tree.
@@ -20,7 +22,8 @@ import com.jvms.i18neditor.util.Images;
  */
 public class TranslationTreeCellRenderer extends DefaultTreeCellRenderer {
 	private final static long serialVersionUID = 3511394180407171920L;
-	private final static ImageIcon ROOT_ICON = Images.loadFromClasspath("images/icon-folder.png");
+	private final static ImageIcon JSON_ICON = Images.loadFromClasspath("images/json.png");
+	private final static ImageIcon FOLDER_ICON = Images.loadFromClasspath("images/icon-folder.png");
 	private final Color selectionBackground;
 	
 	public TranslationTreeCellRenderer() {
@@ -47,13 +50,17 @@ public class TranslationTreeCellRenderer extends DefaultTreeCellRenderer {
         JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         l.setOpaque(true);
         l.setForeground(tree.getForeground());
-        l.setBackground(tree.getBackground());            	
+        l.setBackground(tree.getBackground());
         if (!node.isRoot() && (node.hasError() || model.hasErrorChildNode(node))) {
-        	l.setIcon(new TranslationTreeStatusIcon(StatusIconType.Warning));
+        	l.setIcon(new TranslationTreeStatusIcon(TranslationTreeStatusIcon.StatusIconType.Warning));
         }
-        if (node.isRoot()) {
-        	l.setIcon(ROOT_ICON);
-        }
+		HashMap<TypeFile,ImageIcon> type = new HashMap<>();
+		type.put(TypeFile.FOLDER,FOLDER_ICON);
+		type.put(TypeFile.JSON,JSON_ICON);
+		type.put(TypeFile.ELEMENT,null);
+		l.setIcon(type.get(node.typeFile));
+
+
         if (selected) {
         	l.setBackground(selectionBackground);
         }
