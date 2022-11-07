@@ -24,7 +24,11 @@ import com.jvms.i18neditor.swing.text.BlinkCaret;
  * @author Jacob van Mourik
  */
 public final class Dialogs {
-	
+
+
+	private Dialogs() {
+		throw new IllegalStateException("Utility class");
+	}
 	public static void showErrorDialog(Component parent, String title, String message) {
 		JOptionPane.showMessageDialog(parent, message, title, JOptionPane.ERROR_MESSAGE);
 	}

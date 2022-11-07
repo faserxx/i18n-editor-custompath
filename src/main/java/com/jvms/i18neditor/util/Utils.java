@@ -21,6 +21,7 @@ public class Utils {
 
     private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
+
     public static Optional<String> getExtension(File file) {
         String filename = file.getName();
         return Optional.of(filename)
@@ -69,6 +70,7 @@ public class Utils {
 
     public static Pair<Boolean, TranslationTreeNode> createTreeByDir(EditorProject project, Editor editor, File node) {
 
+        //This boolean is to show if there is any json that does not comply with the structure
         boolean showErrorJsonMalformed = false;
         //Create the node as usually
         TranslationTreeNode ret = new TranslationTreeNode(node.getName(), TypeFile.FOLDER);
@@ -78,6 +80,7 @@ public class Utils {
 
 
             Pair<Boolean, TranslationTreeNode> analize = analizeJson(project, editor, new File(node, "i18n"));
+
             ret = analize.second;
             if (Boolean.TRUE.equals(analize.first)) {
                 showErrorJsonMalformed = true;
@@ -106,7 +109,7 @@ public class Utils {
 
                 //If is not a directory must be a json file or a metadata or the folder not have a valid structure
                 if (!child.isDirectory() && !child.getName().equals(".i18n-editor-metadata") && !Utils.getExtension(child).equals("json")) {
-                    showError(MessageBundle.get("dialogs.notvalid.folderstructure", child.getAbsolutePath()));
+                    showError(MessageBundle.get("dialogs.notvalid.folderstructure", child.getParentFile().getAbsolutePath()));
                     return null;
                 }
 

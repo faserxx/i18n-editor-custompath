@@ -18,7 +18,7 @@ import com.jvms.i18neditor.util.MessageBundle;
  * @author Jacob van Mourik
  */
 public class AddTranslationMenuItem extends JMenuItem {
-	private final static long serialVersionUID = -2673278052970076105L;
+	private static final long serialVersionUID = -2673278052970076105L;
 	
 	public AddTranslationMenuItem(Editor editor, TranslationTreeNode node, boolean enabled) {
 		this(editor, enabled, e -> editor.showAddTranslationDialog(node));

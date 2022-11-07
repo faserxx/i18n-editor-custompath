@@ -19,8 +19,9 @@ import com.jvms.i18neditor.util.MessageBundle;
  * 
  * @author Jacob van Mourik
  */
+@SuppressWarnings("java:S1210")
 public abstract class AbstractSettingsPane extends JPanel {
-	private final static long serialVersionUID = -8953194193840198893L;
+	private static final long serialVersionUID = -8953194193840198893L;
 	private final GridBagConstraints vGridBagConstraints;
 	
 	protected final List<ComboBoxFileStructure> fileStructureComboBoxItems = Lists.newArrayList(FileStructure.values()).stream()
@@ -29,7 +30,7 @@ public abstract class AbstractSettingsPane extends JPanel {
 			.collect(Collectors.toList());
 	
 	protected final List<ComboBoxLocale> localeComboBoxItems = Editor.SUPPORTED_LANGUAGES.stream()
-			.map(val -> new ComboBoxLocale(val))
+			.map(ComboBoxLocale::new)
 			.sorted()
 			.collect(Collectors.toList());
 	
@@ -76,8 +77,10 @@ public abstract class AbstractSettingsPane extends JPanel {
 		public int compareTo(ComboBoxFileStructure o) {
 			return toString().compareTo(o.toString());
 		}
+
+
 	}
-	
+
 	protected class ComboBoxLocale implements Comparable<ComboBoxLocale> {
 		private final Locale locale;
 		

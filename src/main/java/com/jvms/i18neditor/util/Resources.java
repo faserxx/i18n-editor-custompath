@@ -142,10 +142,11 @@ public final class Resources {
             }
             resource.setTranslations(translations);
             resource.setChecksum(createChecksum(resource));
-        } catch (JsonSyntaxException ex) {
+        } catch (Exception ex) {
             showErrorJson = true;
 
         }
+
         return showErrorJson;
     }
 
@@ -244,10 +245,12 @@ public final class Resources {
         return result;
     }
 
-    private static SortedMap<String, String> fromJson(String json) throws JsonSyntaxException {
+    private static SortedMap<String, String> fromJson(String json) throws JsonSyntaxException,IllegalArgumentException {
         SortedMap<String, String> result = Maps.newTreeMap();
         JsonElement elem = new Gson().fromJson(json, JsonElement.class);
-        fromJson(null, elem, result);
+
+            fromJson(null, elem, result);
+
 
 
         return result;

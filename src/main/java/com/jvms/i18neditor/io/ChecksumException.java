@@ -3,7 +3,7 @@ package com.jvms.i18neditor.io;
 import java.io.IOException;
 
 public class ChecksumException extends IOException {
-	private final static long serialVersionUID = -5164866588227844439L;
+    private static final long serialVersionUID = -5164866588227844439L;
 
 	/**
      * Constructs an {@code ChecksumException} with {@code null}

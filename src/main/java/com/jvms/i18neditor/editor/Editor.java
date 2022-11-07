@@ -28,18 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -49,7 +38,6 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
 import com.jvms.i18neditor.util.*;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,19 +60,19 @@ import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
  * @author Jacob van Mourik
  */
 public class Editor extends JFrame {
-    private final static long serialVersionUID = 1113029729495390082L;
-    private final static Logger log = LoggerFactory.getLogger(Editor.class);
+    private static final long serialVersionUID = 1113029729495390082L;
+    private static final Logger log = LoggerFactory.getLogger(Editor.class);
 
-    public final static String TITLE = "i18n-editor";
-    public final static String VERSION = "2.0.0-beta.1";
-    public final static String GITHUB_USER = "jcbvm";
-    public final static String GITHUB_PROJECT = "i18n-editor";
-    public final static String PROJECT_FILE = ".i18n-editor-metadata";
-    public final static String SETTINGS_FILE = ".i18n-editor";
-    public final static String SETTINGS_DIR = System.getProperty("user.home");
+    public static final String TITLE = "i18n-editor";
+    public static final String VERSION = "2.0.0-beta.1";
+    public static final String GITHUB_USER = "jcbvm";
+    public static final String GITHUB_PROJECT = "i18n-editor";
+    public static final String PROJECT_FILE = ".i18n-editor-metadata";
+    public static final String SETTINGS_FILE = ".i18n-editor";
+    public static final String SETTINGS_DIR = System.getProperty("user.home");
 
-    public final static Locale DEFAULT_LANGUAGE = Locale.ENGLISH;
-    public final static List<Locale> SUPPORTED_LANGUAGES = Lists.newArrayList(
+    public static final Locale DEFAULT_LANGUAGE = Locale.ENGLISH;
+    protected static final List<Locale> SUPPORTED_LANGUAGES = Lists.newArrayList(
             new Locale("en"),
             new Locale("nl"),
             new Locale("pt", "BR"),
@@ -144,7 +132,7 @@ public class Editor extends JFrame {
             updateUI();
             requestFocusInFirstResourceField();
 
-            SwingUtilities.invokeLater(() -> showAddLocaleDialog());
+            SwingUtilities.invokeLater(this::showAddLocaleDialog);
         } catch (IOException e) {
             log.error("Error creating resource files", e);
             showError(MessageBundle.get("resources.create.error"));
@@ -166,13 +154,16 @@ public class Editor extends JFrame {
         restoreProjectState(project);
         //Create the Nodes with the folder structure
         Pair<Boolean, TranslationTreeNode> createDir = Utils.createTreeByDir(project, this, dir.toFile());
-        if (createDir.first) Utils.showError(MessageBundle.get("dialog.json.invalid"));
-        TranslationTreeNode translationTreeNode = createDir.second;
+
         //if it is null it means that some error occurred and it is not necessary to rebuild the ui
-        if (translationTreeNode != null) {
-            translationTree.setModel(new TranslationTreeModel(translationTreeNode));
+        if (createDir != null) {
+            translationTree.setModel(new TranslationTreeModel(createDir.second));
             settings.setCloseInError(false);
+            if (Boolean.TRUE.equals(createDir.first)) {
+                Utils.showError(MessageBundle.get("dialog.json.invalid"));
+            }
         } else {
+
             //Delete from history the access
             project = null;
             settings.setCloseInError(true);
@@ -693,9 +684,7 @@ public class Editor extends JFrame {
     }
 
     private void requestFocusInFirstResourceField() {
-        resourceFields.stream().findFirst().ifPresent(f -> {
-            f.requestFocusInWindow();
-        });
+        resourceFields.stream().findFirst().ifPresent(JComponent::requestFocusInWindow);
     }
 
     private void clearUI() {
