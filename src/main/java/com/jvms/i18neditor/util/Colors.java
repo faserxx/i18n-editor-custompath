@@ -8,7 +8,9 @@ import java.awt.Color;
  * @author Jacob van Mourik
  */
 public final class Colors {
-
+	private Colors() {
+		throw new IllegalStateException("Utility class");
+	}
 	/**
 	 * Multiplies the RGB values of a color with the given factor.
 	 * 

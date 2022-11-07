@@ -15,7 +15,7 @@ import com.jvms.i18neditor.util.MessageBundle;
  * @author Jacob van Mourik
  */
 public class DuplicateTranslationMenuItem extends JMenuItem {
-	private final static long serialVersionUID = 5207946396515235714L;
+	private static final long serialVersionUID = 5207946396515235714L;
 	
 	public DuplicateTranslationMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.edit.duplicate.title"));

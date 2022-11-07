@@ -11,7 +11,7 @@ import javax.swing.text.TextAction;
  * @author Jacob van Mourik
  */
 public class DeleteAction extends TextAction {
-	private final static long serialVersionUID = -7933405670677160997L;
+	private static final long serialVersionUID = -7933405670677160997L;
 	
 	public DeleteAction(String name) {
 		super(name);

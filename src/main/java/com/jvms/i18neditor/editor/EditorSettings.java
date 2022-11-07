@@ -11,8 +11,8 @@ import com.jvms.i18neditor.FileStructure;
  * @author Jacob van Mourik
  */
 public class EditorSettings {
-	public final static String DEFAULT_RESOURCE_FILE_DEFINITION = "translations{_LOCALE}";
-	
+	public static final String DEFAULT_RESOURCE_FILE_DEFINITION = "{LOCALE}";
+	public boolean closeInError = false;
 	private int windowPositionX;
 	private int windowPositionY;
 	private int windowDeviderPosition;
@@ -70,7 +70,9 @@ public class EditorSettings {
 	public void setWindowHeight(int height) {
 		this.windowHeight = height;
 	}
-
+	public void setCloseInError(boolean closeInError) {
+		this.closeInError = closeInError;
+	}
 	public List<String> getHistory() {
 		return history;
 	}

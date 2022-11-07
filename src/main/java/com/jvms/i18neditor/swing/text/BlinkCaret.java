@@ -9,7 +9,7 @@ import javax.swing.text.DefaultCaret;
  * @author Jacob van Mourik
  */
 public class BlinkCaret extends DefaultCaret {
-	private final static long serialVersionUID = -3365578081904749196L;
+	private static final long serialVersionUID = -3365578081904749196L;
 	
 	public BlinkCaret() {
 		int blinkRate = 0;
