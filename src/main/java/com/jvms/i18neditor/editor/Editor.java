@@ -270,6 +270,7 @@ public class Editor extends JFrame {
 					FileUtils.copyDirectory(new File(pathOld), new File(fc.getSelectedFile().getPath()));
 					importProject(Paths.get(fc.getSelectedFile().getPath()), true);
 					FileUtils.forceDelete(new File(pathOld));
+                    JOptionPane.showMessageDialog(this,MessageBundle.get("dialogs.change.success"));
 				} catch (IOException e) {
 					log.error("Error importing resources via file drop", e);
 					showError(MessageBundle.get("resources.change.path.error"));
@@ -324,12 +325,14 @@ public class Editor extends JFrame {
 		}
 		TranslationTreeNode node = translationTree.getNodeByKey(key);
 		if (node != null) {
-			translationTree.setSelectionNode(node);
+			//translationTree.setSelectionNode(node);
+			JOptionPane.showMessageDialog(this,MessageBundle.get("dialogs.create.branch"));
+			return false;
 		} else if (!confirmNewTranslation(key)) {
 			return false;
 		}
 		if (project != null) {
-			project.getResources().forEach(resource -> resource.storeTranslation(key, ""));				
+			project.getResources().forEach(resource -> resource.storeTranslation(key, ""));
 		}
 		translationTree.addNodeByKey(key);			
 		requestFocusInFirstResourceField();
@@ -513,6 +516,7 @@ public class Editor extends JFrame {
 					JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
 			if (newKey != null) {
 				boolean result = addTranslation(newKey.trim());
+				System.out.println("newKey: "+newKey.trim());
 				if (result) {
 					break;
 				}
