@@ -273,7 +273,7 @@ public class Editor extends JFrame {
                     JOptionPane.showMessageDialog(this,
 							MessageBundle.get("dialogs.change.success"),
 							MessageBundle.get("dialogs.change.title"),
-							JOptionPane.YES_OPTION);
+							JOptionPane.INFORMATION_MESSAGE);
 
 				} catch (IOException e) {
 					log.error("Error importing resources via file drop", e);
