@@ -12,7 +12,7 @@ import com.jvms.i18neditor.FileStructure;
  */
 public class EditorSettings {
 	public static final String DEFAULT_RESOURCE_FILE_DEFINITION = "{LOCALE}";
-	
+	public boolean closeInError = false;
 	private int windowPositionX;
 	private int windowPositionY;
 	private int windowDeviderPosition;
@@ -70,7 +70,9 @@ public class EditorSettings {
 	public void setWindowHeight(int height) {
 		this.windowHeight = height;
 	}
-
+	public void setCloseInError(boolean closeInError) {
+		this.closeInError = closeInError;
+	}
 	public List<String> getHistory() {
 		return history;
 	}

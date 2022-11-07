@@ -49,6 +49,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
 import com.jvms.i18neditor.util.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +152,7 @@ public class Editor extends JFrame {
     }
 
     public void importProject(Path dir) {
+
         //Check if exist the directory
         Preconditions.checkArgument(Files.isDirectory(dir));
 
@@ -159,15 +161,24 @@ public class Editor extends JFrame {
         }
 
         clearUI();
+
         project = new EditorProject(dir);
         restoreProjectState(project);
         //Create the Nodes with the folder structure
-        TranslationTreeNode translationTreeNode = Utils.createTreeByDir(project, this, dir.toFile());
-
+        Pair<Boolean, TranslationTreeNode> createDir = Utils.createTreeByDir(project, this, dir.toFile());
+        if (createDir.first) Utils.showError(MessageBundle.get("dialog.json.invalid"));
+        TranslationTreeNode translationTreeNode = createDir.second;
         //if it is null it means that some error occurred and it is not necessary to rebuild the ui
         if (translationTreeNode != null) {
             translationTree.setModel(new TranslationTreeModel(translationTreeNode));
+            settings.setCloseInError(false);
+        } else {
+            //Delete from history the access
+            project = null;
+            settings.setCloseInError(true);
+
         }
+
         updateTreeNodeStatuses();
         updateHistory();
         updateUI();
@@ -175,6 +186,7 @@ public class Editor extends JFrame {
 
 
     }
+
 
     public boolean saveProject() {
         boolean error = false;
@@ -527,6 +539,7 @@ public class Editor extends JFrame {
         if (result && dirty) {
             setDirty(false);
         }
+
         return result;
     }
 
@@ -548,6 +561,7 @@ public class Editor extends JFrame {
             Locale.setDefault(DEFAULT_LANGUAGE);
         }
 
+
         MessageBundle.loadResources();
 
         setupUI();
@@ -560,15 +574,17 @@ public class Editor extends JFrame {
 
         pack();
         setVisible(true);
-
-        List<String> dirs = settings.getHistory();
-        if (!dirs.isEmpty()) {
-            String lastDir = dirs.get(dirs.size() - 1);
-            Path path = Paths.get(lastDir);
-            if (Files.exists(path)) {
-                importProject(path);
+        if (!settings.closeInError) {
+            List<String> dirs = settings.getHistory();
+            if (!dirs.isEmpty()) {
+                String lastDir = dirs.get(dirs.size() - 1);
+                Path path = Paths.get(lastDir);
+                if (Files.exists(path)) {
+                    importProject(path);
+                }
             }
         }
+        settings.closeInError = true;
 
         if (project == null) {
             updateHistory();
@@ -916,6 +932,7 @@ public class Editor extends JFrame {
         props.setProperty("resource_definition", project.getResourceFileDefinition());
         props.setProperty("resource_structure", project.getResourceFileStructure());
         props.store(Paths.get(project.getPath().toString(), PROJECT_FILE));
+
     }
 
     private void restoreProjectState(EditorProject project) {
@@ -958,6 +975,7 @@ public class Editor extends JFrame {
         props.setProperty("default_input_height", settings.getDefaultInputHeight());
         props.setProperty("key_field_enabled", settings.isKeyFieldEnabled());
         props.setProperty("double_click_tree_toggling", settings.isDoubleClickTreeToggling());
+        props.setProperty("close_in_error", settings.closeInError);
         if (settings.getEditorLanguage() != null) {
             props.setProperty("editor_language", settings.getEditorLanguage());
         }
@@ -997,6 +1015,7 @@ public class Editor extends JFrame {
         settings.setResourceFileDefinition(props.getProperty("resource_definition", EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION));
         settings.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, FileStructure.Flat));
         settings.setEditorLanguage(props.getLocaleProperty("editor_language"));
+        settings.setCloseInError(props.getBooleanProperty("close_in_error", false));
     }
 
     private class TranslationTreeMouseListener extends MouseAdapter {

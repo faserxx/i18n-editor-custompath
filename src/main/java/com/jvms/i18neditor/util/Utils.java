@@ -2,6 +2,7 @@ package com.jvms.i18neditor.util;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonSyntaxException;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.editor.*;
@@ -11,13 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Utils {
-    private final static Logger log = LoggerFactory.getLogger(Editor.class);
+    private Utils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static Optional<String> getExtension(File file) {
         String filename = file.getName();
@@ -26,7 +28,9 @@ public class Utils {
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
-    private static TranslationTreeNode analizeJson(EditorProject project, Editor editor, File dir) {
+    private static Pair<Boolean, TranslationTreeNode> analizeJson(EditorProject project, Editor editor, File dir) throws JsonSyntaxException {
+        final boolean[] showErrorJson = {false};
+
         Optional<ResourceType> type = Optional.ofNullable(project.getResourceType());
         List<Resource> resourceList = null;
         try {
@@ -40,7 +44,10 @@ public class Utils {
 
         resourceList.forEach(resource -> {
             try {
-                Resources.load(resource);
+                if (Resources.load(resource)) {
+                    showErrorJson[0] = true;
+                }
+
                 editor.setupResource(resource);
                 project.addResource(resource);
 
@@ -51,37 +58,49 @@ public class Utils {
         });
 
         project.getResources().forEach(r -> keys.putAll(r.getTranslations()));
-
-        return new TranslationTreeNode(dir.getParentFile().getName(), Lists.newArrayList(keys.keySet()), TypeFile.FOLDER);
+        return Pair.create(showErrorJson[0], new TranslationTreeNode(dir.getParentFile().getName(), Lists.newArrayList(keys.keySet()), TypeFile.FOLDER));
 
 
     }
 
-    private static void showError(String message) {
+   public static void showError(String message) {
         Dialogs.showErrorDialog(null, MessageBundle.get("dialogs.error.title"), message);
     }
 
-    public static TranslationTreeNode createTreeByDir(EditorProject project, Editor editor, File node) {
+    public static Pair<Boolean, TranslationTreeNode> createTreeByDir(EditorProject project, Editor editor, File node) {
+
+        boolean showErrorJsonMalformed = false;
         //Create the node as usually
         TranslationTreeNode ret = new TranslationTreeNode(node.getName(), TypeFile.FOLDER);
 
         //If exist the i18n need to override the default node to eliminate de i18n folder in tree
         if (new File(node, "i18n").exists()) {
-            ret = analizeJson(project, editor, new File(node, "i18n"));
+
+
+            Pair<Boolean, TranslationTreeNode> analize = analizeJson(project, editor, new File(node, "i18n"));
+            ret = analize.second;
+            if (Boolean.TRUE.equals(analize.first)) {
+                showErrorJsonMalformed = true;
+            }
+
+
         }
 
         //If is directory iterate for the childs
         if (node.isDirectory()) {
-
             for (File child : Objects.requireNonNull(node.listFiles())) {
 
                 //If is is a directory and not contain i18n (because we analixed that before ) create a structure recursively
                 if (child.isDirectory() && !child.getName().equals("i18n")) {
-                 TranslationTreeNode noda =   createTreeByDir(project, editor, child);
-                 //If it is null it means that some error occurred and it is not necessary to rebuild the ui
-                 if(noda == null){
-                     return null;
-                 }
+                    Pair<Boolean, TranslationTreeNode> createDir = createTreeByDir(project, editor, child);
+                    TranslationTreeNode noda = createDir.second;
+                    if (Boolean.TRUE.equals(createDir.first)) {
+                        showErrorJsonMalformed = true;
+                    }
+                    //If it is null it means that some error occurred and it is not necessary to rebuild the ui
+                    if (noda == null) {
+                        return null;
+                    }
                     ret.add(noda);
                 }
 
@@ -94,6 +113,8 @@ public class Utils {
             }
 
         }
-        return ret;
+
+
+        return Pair.create(showErrorJsonMalformed, ret);
     }
 }
