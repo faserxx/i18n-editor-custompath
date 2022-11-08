@@ -1,171 +1,173 @@
 package com.jvms.i18neditor.editor;
 
+import com.jvms.i18neditor.FileStructure;
+
 import java.util.List;
 import java.util.Locale;
 
-import com.jvms.i18neditor.FileStructure;
-
 /**
  * This class represents the editor settings.
- * 
+ *
  * @author Jacob van Mourik
  */
 public class EditorSettings {
-	public static final String DEFAULT_RESOURCE_FILE_DEFINITION = "{LOCALE}";
-	public boolean closeInError = false;
-	private int windowPositionX;
-	private int windowPositionY;
-	private int windowDeviderPosition;
-	private int windowWidth;
-	private int windowHeight;
-	private boolean minifyResources;
-	private boolean flattenJSON;
-	private List<String> history;
-	private List<String> lastExpandedNodes;
-	private String lastSelectedNode;
-	private boolean checkVersionOnStartup;
-	private int defaultInputHeight;
-	private boolean keyFieldEnabled;
-	private boolean doubleClickTreeToggling;
-	private String resourceFileDifinition;
-	private Locale editorLanguage;
-	private FileStructure resourceFileStructure;
-	
-	public int getWindowPositionX() {
-		return windowPositionX;
-	}
-	
-	public void setWindowPositionX(int windowPositionX) {
-		this.windowPositionX = windowPositionX;
-	}
-	
-	public int getWindowPositionY() {
-		return windowPositionY;
-	}
-	
-	public void setWindowPositionY(int windowPositionY) {
-		this.windowPositionY = windowPositionY;
-	}
-	
-	public int getWindowDeviderPosition() {
-		return windowDeviderPosition;
-	}
-	
-	public void setWindowDeviderPosition(int deviderPosition) {
-		this.windowDeviderPosition = deviderPosition;
-	}
-	
-	public int getWindowWidth() {
-		return windowWidth;
-	}
-	
-	public void setWindowWidth(int width) {
-		this.windowWidth = width;
-	}
-	
-	public int getWindowHeight() {
-		return windowHeight;
-	}
-	
-	public void setWindowHeight(int height) {
-		this.windowHeight = height;
-	}
-	public void setCloseInError(boolean closeInError) {
-		this.closeInError = closeInError;
-	}
-	public List<String> getHistory() {
-		return history;
-	}
+    public static final String DEFAULT_RESOURCE_FILE_DEFINITION = "{LOCALE}";
+    public boolean closeInError = false;
+    private int windowPositionX;
+    private int windowPositionY;
+    private int windowDeviderPosition;
+    private int windowWidth;
+    private int windowHeight;
+    private boolean minifyResources;
+    private boolean flattenJSON;
+    private List<String> history;
+    private List<String> lastExpandedNodes;
+    private String lastSelectedNode;
+    private boolean checkVersionOnStartup;
+    private int defaultInputHeight;
+    private boolean keyFieldEnabled;
+    private boolean doubleClickTreeToggling;
+    private String resourceFileDifinition;
+    private Locale editorLanguage;
+    private FileStructure resourceFileStructure;
 
-	public void setHistory(List<String> history) {
-		this.history = history;
-	}
-	
-	public List<String> getLastExpandedNodes() {
-		return lastExpandedNodes;
-	}
+    public int getWindowPositionX() {
+        return windowPositionX;
+    }
 
-	public void setLastExpandedNodes(List<String> lastExpandedNodes) {
-		this.lastExpandedNodes = lastExpandedNodes;
-	}
+    public void setWindowPositionX(int windowPositionX) {
+        this.windowPositionX = windowPositionX;
+    }
 
-	public String getLastSelectedNode() {
-		return lastSelectedNode;
-	}
+    public int getWindowPositionY() {
+        return windowPositionY;
+    }
 
-	public void setLastSelectedNode(String lastSelectedNode) {
-		this.lastSelectedNode = lastSelectedNode;
-	}
+    public void setWindowPositionY(int windowPositionY) {
+        this.windowPositionY = windowPositionY;
+    }
 
-	public String getResourceFileDefinition() {
-		return resourceFileDifinition;
-	}
+    public int getWindowDeviderPosition() {
+        return windowDeviderPosition;
+    }
 
-	public void setResourceFileDefinition(String resourceFileDifinition) {
-		this.resourceFileDifinition = resourceFileDifinition;
-	}
+    public void setWindowDeviderPosition(int deviderPosition) {
+        this.windowDeviderPosition = deviderPosition;
+    }
 
-	public boolean isMinifyResources() {
-		return minifyResources;
-	}
+    public int getWindowWidth() {
+        return windowWidth;
+    }
 
-	public void setMinifyResources(boolean minifyResources) {
-		this.minifyResources = minifyResources;
-	}
+    public void setWindowWidth(int width) {
+        this.windowWidth = width;
+    }
 
-	public boolean isCheckVersionOnStartup() {
-		return checkVersionOnStartup;
-	}
+    public int getWindowHeight() {
+        return windowHeight;
+    }
 
-	public void setCheckVersionOnStartup(boolean checkVersionOnStartup) {
-		this.checkVersionOnStartup = checkVersionOnStartup;
-	}
+    public void setWindowHeight(int height) {
+        this.windowHeight = height;
+    }
 
-	public int getDefaultInputHeight() {
-		return defaultInputHeight;
-	}
+    public void setCloseInError(boolean closeInError) {
+        this.closeInError = closeInError;
+    }
 
-	public void setDefaultInputHeight(int rows) {
-		this.defaultInputHeight = rows;
-	}
+    public List<String> getHistory() {
+        return history;
+    }
 
-	public boolean isKeyFieldEnabled() {
-		return keyFieldEnabled;
-	}
+    public void setHistory(List<String> history) {
+        this.history = history;
+    }
 
-	public void setKeyFieldEnabled(boolean keyFieldEnabled) {
-		this.keyFieldEnabled = keyFieldEnabled;
-	}
+    public List<String> getLastExpandedNodes() {
+        return lastExpandedNodes;
+    }
 
-	public boolean isDoubleClickTreeToggling() {
-		return doubleClickTreeToggling;
-	}
+    public void setLastExpandedNodes(List<String> lastExpandedNodes) {
+        this.lastExpandedNodes = lastExpandedNodes;
+    }
 
-	public void setDoubleClickTreeToggling(boolean doubleClickTreeToggling) {
-		this.doubleClickTreeToggling = doubleClickTreeToggling;
-	}
-	
-	public boolean isFlattenJSON() {
-		return flattenJSON;
-	}
+    public String getLastSelectedNode() {
+        return lastSelectedNode;
+    }
 
-	public void setFlattenJSON(boolean flattenJSON) {
-		this.flattenJSON = flattenJSON;
-	}
+    public void setLastSelectedNode(String lastSelectedNode) {
+        this.lastSelectedNode = lastSelectedNode;
+    }
 
-	public Locale getEditorLanguage() {
-		return editorLanguage;
-	}
+    public String getResourceFileDefinition() {
+        return resourceFileDifinition;
+    }
 
-	public void setEditorLanguage(Locale editorLanguage) {
-		this.editorLanguage = editorLanguage;
-	}
+    public void setResourceFileDefinition(String resourceFileDifinition) {
+        this.resourceFileDifinition = resourceFileDifinition;
+    }
 
-	public FileStructure getResourceFileStructure() {
-		return resourceFileStructure;
-	}
+    public boolean isMinifyResources() {
+        return minifyResources;
+    }
 
-	public void setResourceFileStructure(FileStructure resourceFileStructure) {
-		this.resourceFileStructure = resourceFileStructure;
-	}
+    public void setMinifyResources(boolean minifyResources) {
+        this.minifyResources = minifyResources;
+    }
+
+    public boolean isCheckVersionOnStartup() {
+        return checkVersionOnStartup;
+    }
+
+    public void setCheckVersionOnStartup(boolean checkVersionOnStartup) {
+        this.checkVersionOnStartup = checkVersionOnStartup;
+    }
+
+    public int getDefaultInputHeight() {
+        return defaultInputHeight;
+    }
+
+    public void setDefaultInputHeight(int rows) {
+        this.defaultInputHeight = rows;
+    }
+
+    public boolean isKeyFieldEnabled() {
+        return keyFieldEnabled;
+    }
+
+    public void setKeyFieldEnabled(boolean keyFieldEnabled) {
+        this.keyFieldEnabled = keyFieldEnabled;
+    }
+
+    public boolean isDoubleClickTreeToggling() {
+        return doubleClickTreeToggling;
+    }
+
+    public void setDoubleClickTreeToggling(boolean doubleClickTreeToggling) {
+        this.doubleClickTreeToggling = doubleClickTreeToggling;
+    }
+
+    public boolean isFlattenJSON() {
+        return flattenJSON;
+    }
+
+    public void setFlattenJSON(boolean flattenJSON) {
+        this.flattenJSON = flattenJSON;
+    }
+
+    public Locale getEditorLanguage() {
+        return editorLanguage;
+    }
+
+    public void setEditorLanguage(Locale editorLanguage) {
+        this.editorLanguage = editorLanguage;
+    }
+
+    public FileStructure getResourceFileStructure() {
+        return resourceFileStructure;
+    }
+
+    public void setResourceFileStructure(FileStructure resourceFileStructure) {
+        this.resourceFileStructure = resourceFileStructure;
+    }
 }

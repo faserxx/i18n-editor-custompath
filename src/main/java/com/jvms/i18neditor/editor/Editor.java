@@ -1,47 +1,5 @@
 package com.jvms.i18neditor.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.SplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.tree.TreePath;
-
-import com.jvms.i18neditor.util.*;
-import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -52,7 +10,34 @@ import com.jvms.i18neditor.io.ChecksumException;
 import com.jvms.i18neditor.swing.JFileDrop;
 import com.jvms.i18neditor.swing.JScrollablePanel;
 import com.jvms.i18neditor.swing.util.Dialogs;
+import com.jvms.i18neditor.util.*;
 import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.SplitPaneUI;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents the main class of the editor.
@@ -60,9 +45,6 @@ import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
  * @author Jacob van Mourik
  */
 public class Editor extends JFrame {
-    private static final long serialVersionUID = 1113029729495390082L;
-    private static final Logger log = LoggerFactory.getLogger(Editor.class);
-
     public static final String TITLE = "i18n-editor";
     public static final String VERSION = "2.0.0-beta.1";
     public static final String GITHUB_USER = "jcbvm";
@@ -70,17 +52,17 @@ public class Editor extends JFrame {
     public static final String PROJECT_FILE = ".i18n-editor-metadata";
     public static final String SETTINGS_FILE = ".i18n-editor";
     public static final String SETTINGS_DIR = System.getProperty("user.home");
-
     public static final Locale DEFAULT_LANGUAGE = Locale.ENGLISH;
     protected static final List<Locale> SUPPORTED_LANGUAGES = Lists.newArrayList(
             new Locale("en"),
             new Locale("nl"),
             new Locale("pt", "BR"),
             new Locale("es", "ES"));
-
-    private EditorProject project;
-    private final EditorSettings settings = new EditorSettings();
+    private static final long serialVersionUID = 1113029729495390082L;
+    private static final Logger log = LoggerFactory.getLogger(Editor.class);
+    private EditorSettings settings = new EditorSettings();
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private EditorProject project;
     private boolean dirty;
 
     private EditorMenuBar editorMenu;
@@ -139,10 +121,78 @@ public class Editor extends JFrame {
         }
     }
 
-    public void importProject(Path dir) {
+    public void closeProject() {
+        if (project != null) {
+            closeCurrentProject();
+            project = null;
+            clearUI();
+        }
+    }
 
+    public void changePathFolder() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                MessageBundle.get("dialogs.change.path.text"),
+                MessageBundle.get("dialogs.change.path.title"),
+                JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle(MessageBundle.get("dialogs.project.change.path.title"));
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int result = fc.showOpenDialog(this);
+            String pathOld = project.getPath().toString();
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    FileUtils.cleanDirectory(new File(fc.getSelectedFile().getPath()));
+                    FileUtils.copyDirectory(new File(pathOld), new File(fc.getSelectedFile().getPath()));
+                    importProject(Paths.get(fc.getSelectedFile().getPath()));
+                    FileUtils.forceDelete(new File(pathOld));
+                    JOptionPane.showMessageDialog(this,
+                            MessageBundle.get("dialogs.change.success"),
+                            MessageBundle.get("dialogs.change.title"),
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                } catch (IOException e) {
+                    log.error("Error copy file to another directory", e);
+                    showError(MessageBundle.get("resources.change.path.error"));
+                }
+            }
+        }
+    }
+
+
+    public void restoreToDefaultProject() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                MessageBundle.get("dialogs.restore.text"),
+                MessageBundle.get("dialogs.restore.confirmation.title"),
+                JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            File fileToDeleted = new File(SETTINGS_DIR, SETTINGS_FILE);
+            if (fileToDeleted.delete()) {
+                JOptionPane.showMessageDialog(this,
+                        MessageBundle.get("dialogs.restore.success"),
+                        MessageBundle.get("dialogs.restore.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+                EditorSettings settingsa = new EditorSettings();
+                settingsa.setResourceFileDefinition(settings.getResourceFileDefinition());
+                settingsa.setResourceFileStructure(settings.getResourceFileStructure());
+                settingsa.setHistory(new ArrayList<>());
+                settings = settingsa;
+                storeEditorState();
+                closeProject();
+                launch();
+            } else {
+                log.error("Error to deleted file: " + Paths.get(SETTINGS_DIR, SETTINGS_FILE));
+                showError(MessageBundle.get("resources.delete.file.i18n-editor"));
+            }
+        }
+    }
+
+    public void importProject(Path dir) {
+        if (!dir.toFile().exists()) {
+            Utils.showError(MessageBundle.get("dialogs.dir.notexist"));
+        }
         //Check if exist the directory
-        Preconditions.checkArgument(Files.isDirectory(dir));
+        //Preconditions.checkArgument(Files.isDirectory(dir));
 
         if (!closeCurrentProject()) {
             return;
@@ -262,7 +312,12 @@ public class Editor extends JFrame {
         }
         TranslationTreeNode node = translationTree.getNodeByKey(key);
         if (node != null) {
-            translationTree.setSelectionNode(node);
+            //translationTree.setSelectionNode(node);
+            JOptionPane.showMessageDialog(this,
+                    MessageBundle.get("dialogs.create.branch"),
+                    MessageBundle.get("dialogs.branch.title"),
+                    JOptionPane.YES_OPTION);
+            return false;
         } else if (!confirmNewTranslation(key)) {
             return false;
         }
@@ -1048,7 +1103,9 @@ public class Editor extends JFrame {
                 String key = node.getKey();
                 translationField.setValue(key);
                 resourceFields.forEach(f -> {
-                    f.setValue(key);
+                    //Trunkate the key based on his parent
+                    String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
+                    f.setValue(trunkateKey);
                     f.setEnabled(node.isEditable() && (node.isLeaf() || f.getResource().supportsParentValues()));
                 });
 

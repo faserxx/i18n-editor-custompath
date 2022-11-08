@@ -5,28 +5,52 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.editor.*;
+import com.jvms.i18neditor.editor.Editor;
+import com.jvms.i18neditor.editor.EditorProject;
+import com.jvms.i18neditor.editor.TranslationTreeNode;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.tree.TreeNode;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Utils {
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
+
     private Utils() {
         throw new IllegalStateException("Utility class");
     }
-
-    private static final Logger log = LoggerFactory.getLogger(Utils.class);
-
 
     public static Optional<String> getExtension(File file) {
         String filename = file.getName();
         return Optional.of(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+    }
+
+    public static String getNameTrunk(TreeNode node) {
+
+        StringBuilder sb = new StringBuilder();
+
+
+        if (node.getParent() != null) {
+            TranslationTreeNode nodeParent = (TranslationTreeNode) node.getParent();
+            if (nodeParent.typeFile == TypeFile.FOLDER) {
+                sb.append(((TranslationTreeNode) node.getParent()).getKey());
+
+            } else {
+                sb.append(getNameTrunk(node.getParent()));
+            }
+        }
+
+
+        return sb.toString();
     }
 
     private static Pair<Boolean, TranslationTreeNode> analizeJson(EditorProject project, Editor editor, File dir) throws JsonSyntaxException {
@@ -64,7 +88,7 @@ public class Utils {
 
     }
 
-   public static void showError(String message) {
+    public static void showError(String message) {
         Dialogs.showErrorDialog(null, MessageBundle.get("dialogs.error.title"), message);
     }
 

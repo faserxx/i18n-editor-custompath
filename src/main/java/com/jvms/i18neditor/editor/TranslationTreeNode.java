@@ -1,21 +1,19 @@
 package com.jvms.i18neditor.editor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.jvms.i18neditor.swing.util.Dialogs;
+import com.jvms.i18neditor.util.MessageBundle;
+import com.jvms.i18neditor.util.ResourceKeys;
+import com.jvms.i18neditor.util.TypeFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.jvms.i18neditor.Resource;
-import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.swing.util.Dialogs;
-import com.jvms.i18neditor.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a single node of the translation tree.
@@ -28,31 +26,32 @@ public class TranslationTreeNode extends DefaultMutableTreeNode {
     private String name;
     private boolean error;
     public TypeFile typeFile = TypeFile.JSON;
+
     private void showError(String message) {
         Dialogs.showErrorDialog(null, MessageBundle.get("dialogs.error.title"), message);
     }
 
 
-
-public  TranslationTreeNode(String name,TypeFile typeFile){
+    public TranslationTreeNode(String name, TypeFile typeFile) {
         this.typeFile = typeFile;
         this.name = name;
-}
+    }
 
-    public TranslationTreeNode(String name, List<String> keys,TypeFile typeFile) {
+    public TranslationTreeNode(String name, List<String> keys, TypeFile typeFile) {
         super();
         this.name = name;
-       this.typeFile = typeFile;
+        this.typeFile = typeFile;
         ResourceKeys.uniqueRootKeys(keys).forEach(rootKey -> {
             List<String> subKeys = ResourceKeys.extractChildKeys(keys, rootKey);
 
             add(new TranslationTreeNode(rootKey, subKeys));
         });
     }
+
     public TranslationTreeNode(String name, List<String> keys) {
         super();
         this.name = name;
-        if(ResourceKeys.uniqueRootKeys(keys).size() == 0){
+        if (ResourceKeys.uniqueRootKeys(keys).size() == 0) {
             this.typeFile = TypeFile.ELEMENT;
         }
 

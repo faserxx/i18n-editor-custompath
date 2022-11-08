@@ -1,5 +1,15 @@
 package com.jvms.i18neditor.util;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.*;
+import com.jvms.i18neditor.FileStructure;
+import com.jvms.i18neditor.Resource;
+import com.jvms.i18neditor.ResourceType;
+import com.jvms.i18neditor.io.ChecksumException;
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -8,27 +18,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.google.gson.*;
-import com.google.gson.stream.MalformedJsonException;
-import org.apache.commons.lang3.StringEscapeUtils;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.jvms.i18neditor.FileStructure;
-import com.jvms.i18neditor.Resource;
-import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.io.ChecksumException;
 
 /**
  * This class provides utility functions for a {@link Resource}.
@@ -165,19 +158,22 @@ public final class Resources {
      * @throws IOException if an I/O error occurs writing the file.
      */
     public static void write(Resource resource, boolean prettyPrinting, boolean flattenKeys) throws IOException {
-        System.out.println(resource.getPath());
+
         if (resource.getChecksum() != null) {
             String checksum = createChecksum(resource);
             if (!checksum.equals(resource.getChecksum())) {
                 throw new ChecksumException("File on disk has been changed.");
             }
         }
+
         ResourceType type = resource.getType();
         if (type == ResourceType.Properties) {
             ExtendedProperties content = toProperties(resource.getTranslations());
             content.store(resource.getPath());
         } else {
-            String content = toJson(resource.getTranslations(), prettyPrinting, flattenKeys);
+
+            String content = toJson(resource, prettyPrinting, flattenKeys);
+
             if (type == ResourceType.ES6) {
                 content = jsonToEs6(content);
             }
@@ -245,12 +241,11 @@ public final class Resources {
         return result;
     }
 
-    private static SortedMap<String, String> fromJson(String json) throws JsonSyntaxException,IllegalArgumentException {
+    private static SortedMap<String, String> fromJson(String json) throws JsonSyntaxException, IllegalArgumentException {
         SortedMap<String, String> result = Maps.newTreeMap();
         JsonElement elem = new Gson().fromJson(json, JsonElement.class);
 
-            fromJson(null, elem, result);
-
+        fromJson(null, elem, result);
 
 
         return result;
@@ -271,7 +266,22 @@ public final class Resources {
         }
     }
 
-    private static String toJson(Map<String, String> translations, boolean prettify, boolean flattenKeys) {
+    private static String toJson(Resource resource, boolean prettify, boolean flattenKeys) {
+        String path = resource.getPath().getParent().getParent().toFile().getName();
+        SortedMap<String, String> translations = new TreeMap<>(resource.getTranslations());
+        List<String> as = new ArrayList<>();
+        for (Map.Entry<String, String> entry : translations.entrySet()) {
+            if (entry.getKey().startsWith(path)) {
+                as.add(entry.getKey());
+
+            }
+
+        }
+        for (String a : as) {
+            translations.put(a.replaceFirst(path + ".", ""), translations.get(a));
+            translations.remove(a);
+        }
+        resource.setTranslations(translations);
         List<String> keys = Lists.newArrayList(translations.keySet());
         JsonElement elem = !flattenKeys ? toJson(translations, null, keys) : toFlatJson(translations, keys);
         GsonBuilder builder = new GsonBuilder().disableHtmlEscaping();
