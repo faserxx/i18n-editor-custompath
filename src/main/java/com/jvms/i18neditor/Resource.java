@@ -1,17 +1,13 @@
 package com.jvms.i18neditor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jvms.i18neditor.util.ResourceKeys;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
  * A resource is a container for storing i18n data and is defined by the following properties:
@@ -112,7 +108,14 @@ public class Resource {
      * @param    key the key of the translation to look for.
      */
     public boolean hasTranslation(String key) {
-        return !Strings.isNullOrEmpty(translations.get(key));
+        return translations.get(key) !=null || translationsStartWith(key);
+    }
+    boolean translationsStartWith(String key){
+       return translations.keySet()
+                .stream()
+                .anyMatch(s -> s.startsWith(key));
+
+
     }
 
     /**

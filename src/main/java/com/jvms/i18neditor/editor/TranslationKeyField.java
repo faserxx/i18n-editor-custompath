@@ -24,6 +24,7 @@ public class TranslationKeyField extends JTextField {
     }
 
     public void setValue(String value) {
+
         setText(value);
         undoManager.discardAllEdits();
     }

@@ -8,11 +8,13 @@ import com.jvms.i18neditor.FileStructure;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.io.ChecksumException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -169,9 +171,10 @@ public final class Resources {
         ResourceType type = resource.getType();
         if (type == ResourceType.Properties) {
             ExtendedProperties content = toProperties(resource.getTranslations());
+
             content.store(resource.getPath());
         } else {
-
+            Utils.compareJsonString(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
             String content = toJson(resource, prettyPrinting, flattenKeys);
 
             if (type == ResourceType.ES6) {
@@ -267,6 +270,7 @@ public final class Resources {
     }
 
     private static String toJson(Resource resource, boolean prettify, boolean flattenKeys) {
+
         String path = resource.getPath().getParent().getParent().toFile().getName();
         SortedMap<String, String> translations = new TreeMap<>(resource.getTranslations());
         List<String> as = new ArrayList<>();
@@ -316,7 +320,7 @@ public final class Resources {
         if (key == null) {
             return new JsonObject();
         }
-        if (Strings.isNullOrEmpty(translations.get(key))) {
+        if (translations.get(key) == null) {
             return JsonNull.INSTANCE;
         }
         return new JsonPrimitive(translations.get(key));

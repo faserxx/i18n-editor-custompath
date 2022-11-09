@@ -18,7 +18,6 @@ public class TranslationTreeNodeMenu extends JPopupMenu {
         if (!node.isRoot()) {
             addSeparator();
             add(new RenameTranslationMenuItem(editor, true));
-            add(new DuplicateTranslationMenuItem(editor, true));
             add(new RemoveTranslationMenuItem(editor, true));
             add(new CopyTranslationKeyToClipboardMenuItem(editor, true));
         }

@@ -30,10 +30,11 @@ public class EditorMenuBar extends JMenuBar {
     private JMenuItem reloadMenuItem;
     private JMenuItem addTranslationMenuItem;
     private JMenuItem findTranslationMenuItem;
+    private JMenuItem findByLanguageMenuItem;
     private JMenuItem renameTranslationMenuItem;
     private JMenuItem copyTranslationKeyMenuItem;
-    private JMenuItem duplicateTranslationMenuItem;
     private JMenuItem removeTranslationMenuItem;
+    private JMenuItem clearSearchMenuItem;
     private JMenuItem changePathFolderProjectMenuItem;
     private JMenuItem closeProjectMenuItem;
     private JMenuItem restoreToDefaultMenuItem;
@@ -54,7 +55,11 @@ public class EditorMenuBar extends JMenuBar {
         setSaveable(false);
         setEditable(false);
     }
-
+    //enable clear search
+    public void setEnableClearSearch(boolean enable)
+    {
+        clearSearchMenuItem.setEnabled(enable);
+    }
     @Override
     public void setEnabled(boolean enabled) {
         reloadMenuItem.setEnabled(enabled);
@@ -83,6 +88,7 @@ public class EditorMenuBar extends JMenuBar {
         changePathFolderProjectMenuItem.setEnabled(editable);
         restoreToDefaultMenuItem.setEnabled(editable);
         closeProjectMenuItem.setEnabled(editable);
+        findByLanguageMenuItem.setEnabled(editable);
     }
 
     public void setRecentItems(List<String> items) {
@@ -95,7 +101,7 @@ public class EditorMenuBar extends JMenuBar {
                 Integer n = i + 1;
                 JMenuItem menuItem = new JMenuItem(n + ": " + items.get(i), Character.forDigit(i, 10));
                 Path path = Paths.get(menuItem.getText().replaceFirst("[0-9]+: ", ""));
-                menuItem.addActionListener(e -> editor.importProject(path));
+                menuItem.addActionListener(e -> editor.importProject(path,null));
                 openRecentMenuItem.add(menuItem);
             }
             JMenuItem clearMenuItem = new JMenuItem(MessageBundle.get("menu.file.recent.clear.title"));
@@ -147,6 +153,10 @@ public class EditorMenuBar extends JMenuBar {
         reloadMenuItem = new JMenuItem(MessageBundle.get("menu.file.reload.title"), MessageBundle.getMnemonic("menu.file.reload.vk"));
         reloadMenuItem.addActionListener(e -> editor.reloadProject());
 
+        clearSearchMenuItem= new JMenuItem(MessageBundle.get("menu.file.clear.search.title"),MessageBundle.getMnemonic("menu.file.clear.search.vk"));
+        clearSearchMenuItem.addActionListener(e->editor.reloadProject());
+        clearSearchMenuItem.setEnabled(false);
+
         closeProjectMenuItem = new JMenuItem(MessageBundle.get("menu.file.close.title"), MessageBundle.getMnemonic("menu.file.reload.vk"));
         closeProjectMenuItem.addActionListener(e -> editor.closeProject());
 
@@ -162,6 +172,7 @@ public class EditorMenuBar extends JMenuBar {
         fileMenu.addSeparator();
         fileMenu.add(saveMenuItem);
         fileMenu.add(reloadMenuItem);
+        fileMenu.add(clearSearchMenuItem);
         fileMenu.add(closeProjectMenuItem);
         fileMenu.addSeparator();
         fileMenu.add(exitMenuItem);
@@ -172,20 +183,21 @@ public class EditorMenuBar extends JMenuBar {
 
         addTranslationMenuItem = new AddTranslationMenuItem(editor, tree, false);
         findTranslationMenuItem = new FindTranslationMenuItem(editor, false);
+        findByLanguageMenuItem = new FindByLanguageMenuItem(editor, false);
         removeTranslationMenuItem = new RemoveTranslationMenuItem(editor, false);
-        duplicateTranslationMenuItem = new DuplicateTranslationMenuItem(editor, true);
         renameTranslationMenuItem = new RenameTranslationMenuItem(editor, false);
         copyTranslationKeyMenuItem = new CopyTranslationKeyToClipboardMenuItem(editor, false);
         changePathFolderProjectMenuItem = new ChangePathFolderProjectMenuItem(editor, false);
         restoreToDefaultMenuItem = new RestoreToDefaultMenuItem(editor, false);
+        findByLanguageMenuItem = new FindByLanguageMenuItem(editor, false);
 
         editMenu.add(new AddLocaleMenuItem(editor, true));
         editMenu.addSeparator();
         editMenu.add(addTranslationMenuItem);
         editMenu.add(findTranslationMenuItem);
+        editMenu.add(findByLanguageMenuItem);
         editMenu.addSeparator();
         editMenu.add(renameTranslationMenuItem);
-        editMenu.add(duplicateTranslationMenuItem);
         editMenu.add(removeTranslationMenuItem);
         editMenu.add(copyTranslationKeyMenuItem);
         editMenu.addSeparator();
@@ -252,7 +264,6 @@ public class EditorMenuBar extends JMenuBar {
             boolean enabled = node != null && !node.isRoot();
             renameTranslationMenuItem.setEnabled(enabled);
             copyTranslationKeyMenuItem.setEnabled(enabled);
-            duplicateTranslationMenuItem.setEnabled(enabled);
             removeTranslationMenuItem.setEnabled(enabled);
         });
     }
