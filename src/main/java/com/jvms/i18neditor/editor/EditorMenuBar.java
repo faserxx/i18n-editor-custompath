@@ -64,6 +64,7 @@ public class EditorMenuBar extends JMenuBar {
     public void setEnabled(boolean enabled) {
        reloadMenuItem.setEnabled(enabled);
         openContainingFolderMenuItem.setEnabled(enabled);
+        closeProjectMenuItem.setEnabled(enabled);
         editMenu.setEnabled(enabled);
         viewMenu.setEnabled(enabled);
         settingsMenu.removeAll();
@@ -88,7 +89,7 @@ public class EditorMenuBar extends JMenuBar {
         findTranslationMenuItem.setEnabled(editable);
         changePathFolderProjectMenuItem.setEnabled(editable);
         restoreToDefaultMenuItem.setEnabled(true);
-        closeProjectMenuItem.setEnabled(editable);
+
         findByLanguageMenuItem.setEnabled(editable);
     }
 
