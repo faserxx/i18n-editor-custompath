@@ -152,7 +152,11 @@ public class Editor extends JFrame {
                             MessageBundle.get("dialogs.change.success"),
                             MessageBundle.get("dialogs.change.title"),
                             JOptionPane.INFORMATION_MESSAGE);
-
+                 //eliminando pathOld del history   
+                 List<String> recentList = settings.getHistory();
+                 recentList.remove(pathOld);
+                 settings.setHistory(recentList);
+                 editorMenu.setRecentItems(recentList);
                 } catch (IOException e) {
                     log.error("Error copy file to another directory", e);
                     showError(MessageBundle.get("resources.change.path.error"));
