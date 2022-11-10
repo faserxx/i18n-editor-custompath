@@ -67,14 +67,15 @@ public class EditorMenuBar extends JMenuBar {
         editMenu.setEnabled(enabled);
         viewMenu.setEnabled(enabled);
         settingsMenu.removeAll();
+
         if (enabled) {
             settingsMenu.add(projectSettingsMenuItem);
             settingsMenu.addSeparator();
             settingsMenu.add(editorSettingsMenuItem);
-            settingsMenu.add(restoreToDefaultMenuItem);
         } else {
             settingsMenu.add(editorSettingsMenuItem);
         }
+        settingsMenu.add(restoreToDefaultMenuItem);
         SwingUtilities.updateComponentTreeUI(this);
     }
 
@@ -86,7 +87,7 @@ public class EditorMenuBar extends JMenuBar {
         addTranslationMenuItem.setEnabled(editable);
         findTranslationMenuItem.setEnabled(editable);
         changePathFolderProjectMenuItem.setEnabled(editable);
-        restoreToDefaultMenuItem.setEnabled(editable);
+        restoreToDefaultMenuItem.setEnabled(true);
         closeProjectMenuItem.setEnabled(editable);
         findByLanguageMenuItem.setEnabled(editable);
     }
