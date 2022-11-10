@@ -317,14 +317,7 @@ public class Editor extends JFrame {
         }
     }
 
-    public void duplicateSelectedTranslation() {
-        TranslationTreeNode node = translationTree.getSelectionNode();
-        if (node != null && !node.isRoot()) {
-            showDuplicateTranslationDialog(node.getKey());
-            Utils.writeLogsByNameKey(project, node.getKey(), 'A', MessageBundle.get("log.duplicate.selected.translation") + node.getKey());
 
-        }
-    }
 
     public boolean addLocale(Path path, String localeString) {
         if (project == null) {
@@ -335,7 +328,7 @@ public class Editor extends JFrame {
 
         try {
             Resource resource = Resources.create(project.getResourceType(), path,
-                    project.getResourceFileDefinition(), project.getResourceFileStructure(), Optional.of(locale));
+                    project.getResourceFileDefinition(), project.getResourceFileStructure(),locale);
             addResource(resource);
 
             LogParameters params = new LogParameters("", project.getPath().toAbsolutePath().toString(), 'C', MessageBundle.get("log.add.locale") + localeString);
@@ -517,11 +510,15 @@ public class Editor extends JFrame {
             if (!LocaleUtils.isAvailableLocale(locale)) {
                 Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
             } else {
-                Path path = Utils.retunPathByTypeofNode(translationTree.getSelectionNode(), project,translationTree);
-                Utils.createPathWithLocale(path, localeString);
+
+                addLocale(Utils.retunPathByTypeofNode(translationTree.getSelectionNode(), project,translationTree),localeString);
+
+                localeString = null;
+                /*  Path path = ;
+
                 storeProjectState();
                 importProject(project.getPath(), null);
-                localeString = null;
+                localeString = null;*/
             }
         }
     }
@@ -576,6 +573,7 @@ public class Editor extends JFrame {
             if (newKey != null) {
                 boolean result = addTranslation(newKey.trim());
                 if (result) {
+                    editorMenu.setSaveable(true);
                     break;
                 }
             }
@@ -1148,8 +1146,9 @@ public class Editor extends JFrame {
         }
 
         private void showPopupMenu(MouseEvent e) {
-            if (!e.isPopupTrigger() || project == null || !project.hasResources()) {
-                return;
+
+            if (!e.isPopupTrigger() || project == null ) {
+              return;
             }
             TreePath path = translationTree.getPathForLocation(e.getX(), e.getY());
             if (path == null) {
@@ -1213,6 +1212,7 @@ public class Editor extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 TranslationKeyField field = (TranslationKeyField) e.getSource();
                 String key = field.getValue();
+
                 addTranslation(key);
             }
         }

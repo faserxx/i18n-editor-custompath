@@ -175,10 +175,10 @@ public final class Resources {
             content.store(resource.getPath());
         } else {
             if (resource.getPath().toFile().exists()) {
-                Utils.compareJsonString(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
+                Utils.compareJsonString(Optional.ofNullable(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8)), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
             }
             String content = toJson(resource, prettyPrinting, flattenKeys);
-
+           
             if (type == ResourceType.ES6) {
                 content = jsonToEs6(content);
             }
@@ -206,16 +206,15 @@ public final class Resources {
      * @return The newly created resource.
      * @throws IOException if an I/O error occurs writing the file.
      */
-    public static Resource create(ResourceType type, Path root, String fileDefinition, FileStructure structure, Optional<Locale> locale)
+    public static Resource create(ResourceType type, Path root, String fileDefinition, FileStructure structure, Locale locale)
             throws IOException {
-        String extension = "json";
+        String extension = ".json";
         Path path;
-        if (structure == FileStructure.Nested) {
-            path = Paths.get(root.toString(), locale.get().toString(), getFilename(fileDefinition, locale) + extension);
-        } else {
-            path = Paths.get(root.toString(), getFilename(fileDefinition, locale) + extension);
-        }
-        Resource resource = new Resource(type, path, locale.orElse(null));
+
+
+            path = Paths.get(root.toString(), "i18n",locale+extension);
+
+        Resource resource = new Resource(type, path, locale);
         write(resource, false, false);
         return resource;
     }

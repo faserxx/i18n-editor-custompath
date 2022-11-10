@@ -33,12 +33,12 @@ public class Utils {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void compareJsonString(String old, String newJson, Path path) {
+    public static void compareJsonString(Optional<String> old, String newJson, Path path) {
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, Object>>() {
         }.getType();
 
-        Map<String, Object> leftMap = gson.fromJson(old, type);
+        Map<String, Object> leftMap = gson.fromJson(old.orElse(""), type);
         Map<String, Object> rightMap = gson.fromJson(newJson, type);
         Map<String, Object> leftFlatMap = FlatMapUtil.flatten(leftMap);
         Map<String, Object> rightFlatMap = FlatMapUtil.flatten(rightMap);
@@ -64,9 +64,9 @@ public class Utils {
             return project.getPath();
         }
 
-        if (node.typeFile == TypeFile.FOLDER) {
+     /*   if (node.typeFile == TypeFile.FOLDER) {
             return Paths.get(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree));
-        }
+        }*/
 
         Path path = Paths.get(Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0));
         return path.getParent();
