@@ -130,7 +130,8 @@ public class EditorSettingsPane extends AbstractSettingsPane {
 
         JPanel resourceHeightPanel = new JPanel(new GridLayout(0, 1));
         JLabel resourceHeightLabel = new JLabel(MessageBundle.get("settings.inputheight.title"));
-        JSlider resourceHeightSlider = new JSlider(JSlider.HORIZONTAL, 1, 15, settings.getDefaultInputHeight());
+
+        JSlider resourceHeightSlider = new JSlider(SwingConstants.HORIZONTAL, 1, 15, 5);
         resourceHeightSlider.addChangeListener(e -> {
             settings.setDefaultInputHeight(resourceHeightSlider.getValue());
             editor.updateUI();

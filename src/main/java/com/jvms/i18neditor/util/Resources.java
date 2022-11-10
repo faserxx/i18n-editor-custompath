@@ -174,7 +174,9 @@ public final class Resources {
 
             content.store(resource.getPath());
         } else {
-            Utils.compareJsonString(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
+            if (resource.getPath().toFile().exists()) {
+                Utils.compareJsonString(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
+            }
             String content = toJson(resource, prettyPrinting, flattenKeys);
 
             if (type == ResourceType.ES6) {
@@ -206,7 +208,7 @@ public final class Resources {
      */
     public static Resource create(ResourceType type, Path root, String fileDefinition, FileStructure structure, Optional<Locale> locale)
             throws IOException {
-        String extension = type.getExtension();
+        String extension = "json";
         Path path;
         if (structure == FileStructure.Nested) {
             path = Paths.get(root.toString(), locale.get().toString(), getFilename(fileDefinition, locale) + extension);

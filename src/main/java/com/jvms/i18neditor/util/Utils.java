@@ -57,6 +57,23 @@ public class Utils {
 
     }
 
+    public static Path retunPathByTypeofNode(TranslationTreeNode node, EditorProject project, TranslationTree translationTree) {
+
+        //if is null then is root
+        if (node == null) {
+            return project.getPath();
+        }
+
+        if (node.typeFile == TypeFile.FOLDER) {
+            return Paths.get(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree));
+        }
+
+        Path path = Paths.get(Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0));
+        return path.getParent();
+
+
+    }
+
     public static List<String> getAllPathFromKeys(EditorProject project, String nameKey) {
 
         //Iterate over all resources and find the respective key
@@ -66,6 +83,16 @@ public class Utils {
                 .collect(Collectors.toList());
 
     }
+
+    public static List<String> getAllPathFromKeysAlls(EditorProject project, String nameKey) {
+
+        //Iterate over all resources and find the respective key
+        return project.getResources().stream()
+                .map(x -> x.getPath().toAbsolutePath().toString())
+                .collect(Collectors.toList());
+
+    }
+
 
     public static String restoreStringTrunk(TranslationTreeNode node, String key) {
         return key.replaceFirst(getNameTrunk(node) + ".", "");
@@ -89,6 +116,24 @@ public class Utils {
             LogParameters params = new LogParameters("", x, operation, message);
             LogManager.logMessage(params);
         });
+    }
+
+    public static void createPathWithLocale(Path path, String trim) {
+
+        File file = path.toFile();
+        if (!file.getName().equals("i18n"))
+            file = file.toPath().resolve("i18n").toFile();
+        file.mkdirs();
+
+        //If is json
+
+        try {
+            file.toPath().resolve(trim + ".json").toFile().createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public static String construcPathByNodes(String name, String path, TranslationTree translationTree) {
@@ -214,6 +259,7 @@ public class Utils {
 
                 //If is not a directory must be a json file or a metadata or the folder not have a valid structure
                 if (!child.isDirectory() && !child.getName().equals(".i18n-editor-metadata") && !Files.getFileExtension(child.getName()).equals("json")) {
+
                     showError(MessageBundle.get("dialogs.notvalid.folderstructure", child.getParentFile().getAbsolutePath()));
                     return null;
                 }
