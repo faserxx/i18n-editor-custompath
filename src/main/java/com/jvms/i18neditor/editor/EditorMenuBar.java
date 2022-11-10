@@ -62,7 +62,7 @@ public class EditorMenuBar extends JMenuBar {
     }
     @Override
     public void setEnabled(boolean enabled) {
-        reloadMenuItem.setEnabled(enabled);
+       reloadMenuItem.setEnabled(enabled);
         openContainingFolderMenuItem.setEnabled(enabled);
         editMenu.setEnabled(enabled);
         viewMenu.setEnabled(enabled);
