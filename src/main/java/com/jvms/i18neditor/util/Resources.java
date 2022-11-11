@@ -210,9 +210,13 @@ public final class Resources {
             throws IOException {
         String extension = ".json";
         Path path;
+        String more = "i18n";
+if(root.toFile().getName() .equals(more)){
+    more = "";
+    root.toFile().mkdirs();
+}
 
-
-            path = Paths.get(root.toString(), "i18n",locale+extension);
+            path = Paths.get(root.toString(), more,locale+extension);
 
         Resource resource = new Resource(type, path, locale);
         write(resource, false, false);
