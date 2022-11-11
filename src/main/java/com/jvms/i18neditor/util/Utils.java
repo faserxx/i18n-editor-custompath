@@ -159,8 +159,9 @@ public class Utils {
 
         );
 
-        project.getResources()
-                .forEach(r -> keys.putAll(r.getTranslations()));
+        project.getResources().
+                stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(dir.getAbsolutePath().toString())).
+                forEach(resource -> keys.putAll(resource.getTranslations()));
 
         return Pair.create(showErrorJson[0], new TranslationTreeNode(dir.getParentFile().getName(), Lists.newArrayList(keys.keySet()), TypeFile.FOLDER));
 
