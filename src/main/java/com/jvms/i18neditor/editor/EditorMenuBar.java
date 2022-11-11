@@ -120,23 +120,7 @@ public class EditorMenuBar extends JMenuBar {
         JMenu fileMenu = new JMenu(MessageBundle.get("menu.file.title"));
         fileMenu.setMnemonic(MessageBundle.getMnemonic("menu.file.vk"));
 
-        JMenuItem createJsonMenuItem = new JMenuItem(MessageBundle.get("menu.file.project.new.json.title"));
-        createJsonMenuItem.addActionListener(e -> editor.showCreateProjectDialog(ResourceType.JSON));
-        createJsonMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, keyMask + KeyEvent.SHIFT_DOWN_MASK));
 
-        JMenuItem createEs6MenuItem = new JMenuItem(MessageBundle.get("menu.file.project.new.es6.title"));
-        createEs6MenuItem.addActionListener(e -> editor.showCreateProjectDialog(ResourceType.ES6));
-        createEs6MenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, keyMask + KeyEvent.SHIFT_DOWN_MASK));
-
-        JMenuItem createPropertiesMenuItem = new JMenuItem(MessageBundle.get("menu.file.project.new.properties.title"));
-        createPropertiesMenuItem.addActionListener(e -> editor.showCreateProjectDialog(ResourceType.Properties));
-        createPropertiesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, keyMask + KeyEvent.SHIFT_DOWN_MASK));
-
-        JMenu createMenuItem = new JMenu(MessageBundle.get("menu.file.project.new.title"));
-        createMenuItem.setMnemonic(MessageBundle.getMnemonic("menu.file.project.new.vk"));
-        createMenuItem.add(createJsonMenuItem);
-        createMenuItem.add(createEs6MenuItem);
-        createMenuItem.add(createPropertiesMenuItem);
 
         JMenuItem importMenuItem = new JMenuItem(MessageBundle.get("menu.file.project.import.title"));
         importMenuItem.setMnemonic(MessageBundle.getMnemonic("menu.file.project.import.vk"));
@@ -165,7 +149,7 @@ public class EditorMenuBar extends JMenuBar {
         JMenuItem exitMenuItem = new JMenuItem(MessageBundle.get("menu.file.exit.title"), MessageBundle.getMnemonic("menu.file.exit.vk"));
         exitMenuItem.addActionListener(e -> editor.dispatchEvent(new WindowEvent(editor, WindowEvent.WINDOW_CLOSING)));
 
-        fileMenu.add(createMenuItem);
+
         fileMenu.add(importMenuItem);
         if (Desktop.isDesktopSupported()) {
             fileMenu.add(openContainingFolderMenuItem);

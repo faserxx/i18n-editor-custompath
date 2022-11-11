@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jvms.i18neditor.util.ResourceKeys;
+import com.jvms.i18neditor.util.Utils;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -142,6 +143,7 @@ public class Resource {
      * @param value the value of the translation to add corresponding the given key.
      */
     public void storeTranslation(String key, String value) {
+        key = Utils.transformKeyByPathinResources(key,path);
         checkKey(key);
         String existing = translations.get(key);
         if (value == null || existing != null && existing.equals(value)) {
@@ -243,6 +245,7 @@ public class Resource {
     }
 
     private void duplicateTranslation(String key, String newKey, boolean keepOld) {
+
         Map<String, String> newTranslations = Maps.newTreeMap();
         translations.keySet().forEach(k -> {
             if (ResourceKeys.isChildKeyOf(k, key)) {

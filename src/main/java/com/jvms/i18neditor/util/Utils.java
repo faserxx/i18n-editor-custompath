@@ -188,6 +188,7 @@ public class Utils {
         resourceList.forEach(resource -> {
                     if (dirLenguage == null || resource.getPath().toString().equals(dirLenguage.toString())) {
                         try {
+
                             if (Resources.load(resource)) {
                                 showErrorJson[0] = true;
                             }
@@ -274,4 +275,8 @@ public class Utils {
     }
 
 
+    public static String transformKeyByPathinResources(String key, Path path) {
+        String nameOfFOlder = path.getParent().getParent().toFile().getName();
+                 return key.replaceAll(".*"+ nameOfFOlder+"\\.","");
+    }
 }

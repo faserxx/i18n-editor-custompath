@@ -77,12 +77,12 @@ public class Editor extends JFrame {
     private Map<ResourceField, JLabel> jLabels = new HashMap<>();
 
 
-    public void createProject(Path dir, ResourceType type) {
-        File folder = new File(dir.toString(),"i18n");
-        folder.mkdirs();
-        importProject(dir, null);
-        showAddLocaleDialog();
-       }
+//    public void createProject(Path dir, ResourceType type) {
+//        File folder = new File(dir.toString(),"i18n");
+//        folder.mkdirs();
+//        importProject(dir, null);
+//        showAddLocaleDialog();
+//       }
 
     public void closeProject() {
         if (project != null) {
@@ -470,18 +470,18 @@ public class Editor extends JFrame {
         editorMenu.setRecentItems(Lists.newArrayList());
     }
 
-    public void showCreateProjectDialog(ResourceType type) {
-        JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle(MessageBundle.get("dialogs.project.new.title"));
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int result = fc.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            createProject(Paths.get(fc.getSelectedFile().getPath()), type);
-        } else {
-            updateHistory();
-            updateUI();
-        }
-    }
+//    public void showCreateProjectDialog(ResourceType type) {
+//        JFileChooser fc = new JFileChooser();
+//        fc.setDialogTitle(MessageBundle.get("dialogs.project.new.title"));
+//        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        int result = fc.showOpenDialog(this);
+//        if (result == JFileChooser.APPROVE_OPTION) {
+//            createProject(Paths.get(fc.getSelectedFile().getPath()), type);
+//        } else {
+//            updateHistory();
+//            updateUI();
+//        }
+//    }
 
     public void showImportProjectDialog() {
         String path = null;
