@@ -178,7 +178,7 @@ public final class Resources {
                 Utils.compareJsonString(Optional.ofNullable(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8)), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
             }
             String content = toJson(resource, prettyPrinting, flattenKeys);
-           
+
             if (type == ResourceType.ES6) {
                 content = jsonToEs6(content);
             }
@@ -211,12 +211,12 @@ public final class Resources {
         String extension = ".json";
         Path path;
         String more = "i18n";
-if(root.toFile().getName() .equals(more)){
-    more = "";
-    root.toFile().mkdirs();
-}
+        if (root.toFile().getName().equals(more)) {
+            more = "";
+            root.toFile().mkdirs();
+        }
 
-            path = Paths.get(root.toString(), more,locale+extension);
+        path = Paths.get(root.toString(), more, locale + extension);
 
         Resource resource = new Resource(type, path, locale);
         write(resource, false, false);
