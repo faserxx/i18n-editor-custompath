@@ -113,11 +113,11 @@ public class Editor extends JFrame {
                             MessageBundle.get("dialogs.change.success"),
                             MessageBundle.get("dialogs.change.title"),
                             JOptionPane.INFORMATION_MESSAGE);
-                 //eliminando pathOld del history   
-                 List<String> recentList = settings.getHistory();
-                 recentList.remove(pathOld);
-                 settings.setHistory(recentList);
-                 editorMenu.setRecentItems(recentList);
+                    //eliminando pathOld del history
+                    List<String> recentList = settings.getHistory();
+                    recentList.remove(pathOld);
+                    settings.setHistory(recentList);
+                    editorMenu.setRecentItems(recentList);
                 } catch (IOException e) {
                     log.error("Error copy file to another directory", e);
                     showError(MessageBundle.get("resources.change.path.error"));
@@ -318,8 +318,8 @@ public class Editor extends JFrame {
     }
 
 
-
     public boolean addLocale(Path path, String localeString) {
+
         if (project == null) {
             return false;
         }
@@ -328,7 +328,7 @@ public class Editor extends JFrame {
 
         try {
             Resource resource = Resources.create(project.getResourceType(), path,
-                    project.getResourceFileDefinition(), project.getResourceFileStructure(),locale);
+                    project.getResourceFileDefinition(), project.getResourceFileStructure(), locale);
             addResource(resource);
 
             LogParameters params = new LogParameters("", project.getPath().toAbsolutePath().toString(), 'C', MessageBundle.get("log.add.locale") + localeString);
@@ -510,8 +510,13 @@ public class Editor extends JFrame {
             if (!LocaleUtils.isAvailableLocale(locale)) {
                 Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
             } else {
+                TranslationTreeNode node = translationTree.getSelectionNode();
+                Path path = Utils.retunPathByTypeofNode(node, project, translationTree);
+                if (node.isRoot()) {
+                    path = project.getPath();
 
-                addLocale(Utils.retunPathByTypeofNode(translationTree.getSelectionNode(), project,translationTree),localeString);
+                }
+                addLocale(path, localeString);
 
                 localeString = null;
                 /*  Path path = ;
@@ -559,6 +564,17 @@ public class Editor extends JFrame {
     }
 
     public void showAddTranslationDialog(TranslationTreeNode node) {
+        if (node.typeFile == TypeFile.FOLDER) {
+            Path path = Utils.retunPathByTypeofNode(node, project, translationTree);
+            if (node.isRoot()) {
+                path = project.getPath();
+
+            }
+            if (path.toFile().listFiles().length == 0) {
+                showAddLocaleDialog();
+            }
+
+        }
         String key = "";
         String newKey = "";
         if (node != null && !node.isRoot()) {
@@ -742,6 +758,7 @@ public class Editor extends JFrame {
             resourcesPanel.add(jLabel);
             // resourcesPanel.add(Box.createVerticalStrut(5));
             resourcesPanel.add(field);
+
             //resourcesPanel.add(Box.createVerticalStrut(10));
         });
 
@@ -1147,8 +1164,8 @@ public class Editor extends JFrame {
 
         private void showPopupMenu(MouseEvent e) {
 
-            if (!e.isPopupTrigger() || project == null ) {
-              return;
+            if (!e.isPopupTrigger() || project == null) {
+                return;
             }
             TreePath path = translationTree.getPathForLocation(e.getX(), e.getY());
             if (path == null) {
@@ -1176,7 +1193,10 @@ public class Editor extends JFrame {
                 String key = node.getKey();
                 translationField.setValue(key);
                 resourceFields.forEach(x -> {
-                            if (x.getResource().getPath().toString().contains(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree))) {
+                            if (node.typeFile != TypeFile.ELEMENT) {
+                                resourcesPanel.setVisible(false);
+                            } else if (x.getResource().getPath().toString().contains(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree))) {
+                                resourcesPanel.setVisible(true);
                                 x.setVisible(true);
                                 jLabels.get(x).setVisible(true);
                             } else {
