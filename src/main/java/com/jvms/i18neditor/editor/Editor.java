@@ -1,6 +1,5 @@
 package com.jvms.i18neditor.editor;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.jvms.i18neditor.FileStructure;
@@ -13,6 +12,7 @@ import com.jvms.i18neditor.swing.util.Dialogs;
 import com.jvms.i18neditor.util.*;
 import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,50 +78,11 @@ public class Editor extends JFrame {
 
 
     public void createProject(Path dir, ResourceType type) {
-        try {
-            //Verify if exist directory
-            Preconditions.checkArgument(Files.isDirectory(dir));
-
-            if (!closeCurrentProject()) {
-                return;
-            }
-
-            List<Resource> resourceList = Resources.get(dir,
-                    settings.getResourceFileDefinition(), settings.getResourceFileStructure(), Optional.of(type));
-            if (!resourceList.isEmpty()) {
-                boolean importProject = Dialogs.showConfirmDialog(this,
-                        MessageBundle.get("dialogs.project.new.conflict.title"),
-                        MessageBundle.get("dialogs.project.new.conflict.text"),
-                        JOptionPane.YES_NO_OPTION);
-                if (importProject) {
-                    importProject(dir, null);
-                    return;
-                }
-            }
-
-            clearUI();
-            project = new EditorProject(dir);
-            restoreProjectState(project);
-            project.setResourceType(type);
-
-            if (project.getResourceFileStructure() == FileStructure.Flat) {
-                Resource resource = Resources.create(type, dir,
-                        project.getResourceFileDefinition(), FileStructure.Flat, Optional.empty());
-                setupResource(resource);
-                project.addResource(resource);
-            }
-            translationTree.setModel(new TranslationTreeModel());
-
-            updateHistory();
-            updateUI();
-            requestFocusInFirstResourceField();
-
-            SwingUtilities.invokeLater(this::showAddLocaleDialog);
-        } catch (IOException e) {
-            log.error("Error creating resource files", e);
-            showError(MessageBundle.get("resources.create.error"));
-        }
-    }
+        File folder = new File(dir.toString(),"i18n");
+        folder.mkdirs();
+        importProject(dir, null);
+        showAddLocaleDialog();
+       }
 
     public void closeProject() {
         if (project != null) {
@@ -185,6 +146,7 @@ public class Editor extends JFrame {
                 settings = settingsa;
                 storeEditorState();
                 closeProject();
+                clearUI();
                 launch();
             } else {
                 log.error("Error to deleted file: " + Paths.get(SETTINGS_DIR, SETTINGS_FILE));
@@ -222,7 +184,7 @@ public class Editor extends JFrame {
                             Path testPath = resources.get(i).getPath();
                             Path pathProject = project.getPath();
                             importProject(pathProject, testPath);
-                            System.out.println(testPath);
+
 //                            if (testPath != null) {
 //                                Resource resource = resources.get(i);
 //                                try {
@@ -355,32 +317,22 @@ public class Editor extends JFrame {
         }
     }
 
-    public void duplicateSelectedTranslation() {
-        TranslationTreeNode node = translationTree.getSelectionNode();
-        if (node != null && !node.isRoot()) {
-            showDuplicateTranslationDialog(node.getKey());
-            Utils.writeLogsByNameKey(project, node.getKey(), 'A', MessageBundle.get("log.duplicate.selected.translation") + node.getKey());
 
-        }
-    }
 
-    public boolean addLocale(String localeString) {
+    public boolean addLocale(Path path, String localeString) {
         if (project == null) {
             return false;
         }
+
         Locale locale = Locales.parseLocale(localeString);
-        if (locale == null) {
-            showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
-            return false;
-        }
+
         try {
-            Resource resource = Resources.create(project.getResourceType(), project.getPath(),
-                    project.getResourceFileDefinition(), project.getResourceFileStructure(), Optional.of(locale));
+            Resource resource = Resources.create(project.getResourceType(), path,
+                    project.getResourceFileDefinition(), project.getResourceFileStructure(),locale);
             addResource(resource);
 
             LogParameters params = new LogParameters("", project.getPath().toAbsolutePath().toString(), 'C', MessageBundle.get("log.add.locale") + localeString);
             LogManager.logMessage(params);
-
             requestFocusInFirstResourceField();
             return true;
         } catch (IOException e) {
@@ -546,17 +498,27 @@ public class Editor extends JFrame {
     }
 
     public void showAddLocaleDialog() {
+
         String localeString = "";
         while (localeString != null) {
             localeString = Dialogs.showInputDialog(this,
                     MessageBundle.get("dialogs.locale.add.title"),
                     MessageBundle.get("dialogs.locale.add.text"),
-                    null, JOptionPane.QUESTION_MESSAGE);
-            if (localeString != null) {
-                boolean result = addLocale(localeString.trim());
-                if (result) {
-                    break;
-                }
+                    null, JOptionPane.QUESTION_MESSAGE).trim();
+            Locale locale = new Locale.Builder().setLanguageTag(localeString).build();
+
+            if (!LocaleUtils.isAvailableLocale(locale)) {
+                Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
+            } else {
+
+                addLocale(Utils.retunPathByTypeofNode(translationTree.getSelectionNode(), project,translationTree),localeString);
+
+                localeString = null;
+                /*  Path path = ;
+
+                storeProjectState();
+                importProject(project.getPath(), null);
+                localeString = null;*/
             }
         }
     }
@@ -611,6 +573,7 @@ public class Editor extends JFrame {
             if (newKey != null) {
                 boolean result = addTranslation(newKey.trim());
                 if (result) {
+                    editorMenu.setSaveable(true);
                     break;
                 }
             }
@@ -777,7 +740,7 @@ public class Editor extends JFrame {
             jLabel.setVisible(false);
             jLabels.put(field, jLabel);
             resourcesPanel.add(jLabel);
-           // resourcesPanel.add(Box.createVerticalStrut(5));
+            // resourcesPanel.add(Box.createVerticalStrut(5));
             resourcesPanel.add(field);
             //resourcesPanel.add(Box.createVerticalStrut(10));
         });
@@ -1183,8 +1146,9 @@ public class Editor extends JFrame {
         }
 
         private void showPopupMenu(MouseEvent e) {
-            if (!e.isPopupTrigger() || project == null || !project.hasResources()) {
-                return;
+
+            if (!e.isPopupTrigger() || project == null ) {
+              return;
             }
             TreePath path = translationTree.getPathForLocation(e.getX(), e.getY());
             if (path == null) {
@@ -1248,6 +1212,7 @@ public class Editor extends JFrame {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 TranslationKeyField field = (TranslationKeyField) e.getSource();
                 String key = field.getValue();
+
                 addTranslation(key);
             }
         }
