@@ -7,5 +7,5 @@ package com.jvms.i18neditor;
  */
 public enum FileStructure {
     Flat,
-    Nested
+    Folder
 }

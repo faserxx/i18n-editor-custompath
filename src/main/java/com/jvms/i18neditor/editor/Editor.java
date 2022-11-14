@@ -12,7 +12,6 @@ import com.jvms.i18neditor.swing.util.Dialogs;
 import com.jvms.i18neditor.util.*;
 import com.jvms.i18neditor.util.GithubRepoUtil.GithubRepoReleaseData;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,24 +203,13 @@ public class Editor extends JFrame {
 
         project = new EditorProject(dir);
         restoreProjectState(project);
-        //Create the Nodes with the folder structure
-        Pair<Boolean, TranslationTreeNode> createDir = Utils.createTreeByDir(project, this, dir.toFile(), dirLanguage);
 
-        //if it is null it means that some error occurred and it is not necessary to rebuild the ui
-        if (createDir != null) {
-            translationTree.setModel(new TranslationTreeModel(createDir.second));
-            settings.setCloseInError(false);
-            if (Boolean.TRUE.equals(createDir.first)) {
-                Utils.showError(MessageBundle.get("dialog.json.invalid"));
-            }
-        } else {
-
-            //Delete from history the access
-            project = null;
-            settings.setCloseInError(true);
-
+        // Recreate Tree by Type of File Structure
+        if (project.getResourceFileStructure() == FileStructure.Flat)
+            FlatViewUtils.analizeAndCreateTree(this, project, dir, dirLanguage, translationTree, settings);
+        else {
+            FolderViewUtils.analizeAndCreateTree(this, project, dir, dirLanguage, translationTree, settings);
         }
-
 
         updateTreeNodeStatuses();
         updateHistory();
@@ -835,7 +823,6 @@ public class Editor extends JFrame {
     }
 
 
-
     private void setupGlobalKeyEventDispatcher() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
             if (e.getID() != KeyEvent.KEY_PRESSED || !e.isAltDown() || (SystemUtils.IS_OS_MAC && !e.isMetaDown()) || (!SystemUtils.IS_OS_MAC && !e.isShiftDown())) {
@@ -986,7 +973,7 @@ public class Editor extends JFrame {
             } else {
                 // for backwards compatibility
                 project.setResourceFileDefinition(resourceName);
-                project.setResourceFileStructure(project.getResourceType() == ResourceType.Properties ? FileStructure.Flat : FileStructure.Nested);
+                project.setResourceFileStructure(project.getResourceType() == ResourceType.Properties ? FileStructure.Flat : FileStructure.Folder);
             }
         } else {
             project.setMinifyResources(settings.isMinifyResources());
@@ -1105,8 +1092,11 @@ public class Editor extends JFrame {
                         resourcesPanel.setVisible(true);
                         x.setVisible(true);
                         jLabels.get(x).setVisible(true);
-                        String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
-                        x.setValue(trunkateKey);
+                        x.setValue(key);
+                        if (project.getResourceFileStructure() == FileStructure.Folder) {
+                            String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
+                            x.setValue(trunkateKey);
+                        }
                         x.setEnabled(node.isEditable() && (node.isLeaf() || x.getResource().supportsParentValues()));
                     } else {
 

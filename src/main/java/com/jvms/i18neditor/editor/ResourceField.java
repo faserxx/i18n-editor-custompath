@@ -23,9 +23,7 @@ public class ResourceField extends JTextArea implements Comparable<ResourceField
         this.resource = resource;
         setupUI();
     }
-public void ocult(){
-        setVisible(false);
-}
+
     public String getValue() {
         return getText().trim();
     }

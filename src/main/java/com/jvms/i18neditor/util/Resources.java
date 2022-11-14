@@ -77,7 +77,7 @@ public final class Resources {
                 if (!type.orElse(rt).equals(rt)) {
                     continue;
                 }
-                if (structure == FileStructure.Nested && Files.isDirectory(file)) {
+             /*   if (structure == FileStructure.Nested && Files.isDirectory(file)) {
                     Locale locale = Locales.parseLocale(filename);
                     if (locale == null) {
                         continue;
@@ -86,8 +86,8 @@ public final class Resources {
                     if (Files.isRegularFile(rf)) {
                         result.add(new Resource(rt, rf, locale));
                     }
-                }
-                if (structure == FileStructure.Flat && Files.isRegularFile(file)) {
+                }*/
+                if ( Files.isRegularFile(file)) {
                     Matcher matcher = fileDefinitionPattern.matcher(filename);
                     if (!matcher.matches() && !filename.equals(defaultFileName)) {
                         continue;
