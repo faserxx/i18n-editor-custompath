@@ -72,6 +72,7 @@ public final class Resources {
                 continue;
             }
             String filename = com.google.common.io.Files.getNameWithoutExtension(file.getFileName().toString());
+           if(Utils.isLocaleAvailable(filename)){
             for (ResourceType rt : ResourceType.values()) {
                 if (!type.orElse(rt).equals(rt)) {
                     continue;
@@ -101,6 +102,7 @@ public final class Resources {
                     result.add(new Resource(rt, file, locale));
                 }
             }
+        }
         }
         ;
 

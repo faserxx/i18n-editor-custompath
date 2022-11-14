@@ -3,14 +3,17 @@ package com.jvms.i18neditor.util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.editor.*;
+import com.jvms.i18neditor.editor.Editor;
+import com.jvms.i18neditor.editor.EditorProject;
+import com.jvms.i18neditor.editor.ResourceField;
+import com.jvms.i18neditor.editor.TranslationTreeNode;
 import com.jvms.i18neditor.swing.util.Dialogs;
+import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -77,14 +77,14 @@ public class Utils {
     }
 
     public static Path getPathOfNode(TranslationTreeNode node, EditorProject project) {
-       if (node.typeFile == TypeFile.FOLDER) {
+        if (node.typeFile == TypeFile.FOLDER) {
             String key = node.getKey();
 
             return findDirectoryWithSameName(key, project.getPath().toFile());
         }
 
-       String stringpath = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0);
-       Path path = Paths.get(stringpath).getParent();
+        String stringpath = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0);
+        Path path = Paths.get(stringpath).getParent();
         if ("i18n".equals(path.toFile().getName())) {
             return path.getParent();
         }
@@ -92,11 +92,12 @@ public class Utils {
 
 
     }
-public static boolean ads(ResourceField x, TranslationTreeNode node, EditorProject project){
 
-  return   x.getResource().getPath().getParent().getParent().toString()
-            .equals(Utils.getPathOfNode(node, project).toString());
-}
+    public static boolean ads(ResourceField x, TranslationTreeNode node, EditorProject project) {
+
+        return x.getResource().getPath().getParent().getParent().toString()
+                .equals(Utils.getPathOfNode(node, project).toString());
+    }
 //    public static Path retunPathByTypeofNode(TranslationTreeNode node, EditorProject project, TranslationTree translationTree) {
 //
 //        //if is null then is root
@@ -219,6 +220,17 @@ public static boolean ads(ResourceField x, TranslationTreeNode node, EditorProje
         return sb.toString();
     }
 
+    public static boolean isLocaleAvailable(String localeString) {
+        try {
+            Locale locale = LocaleUtils.toLocale(localeString);
+
+            return Arrays.asList(Locale.getAvailableLocales()).contains(locale);
+        } catch (Exception e) {
+
+            return false;
+        }
+    }
+
     private static Pair<Boolean, TranslationTreeNode> analizeJson(EditorProject project, Editor editor, File dir, Path dirLenguage) throws JsonSyntaxException {
         final boolean[] showErrorJson = {false};
 
@@ -307,12 +319,12 @@ public static boolean ads(ResourceField x, TranslationTreeNode node, EditorProje
                     ret.add(noda);
                 }
 
-                //If is not a directory must be a json file or a metadata or the folder not have a valid structure
+               /* //If is not a directory must be a json file or a metadata or the folder not have a valid structure
                 if (!child.isDirectory() && !child.getName().equals(".i18n-editor-metadata") && !Files.getFileExtension(child.getName()).equals("json")) {
 
                     showError(MessageBundle.get("dialogs.notvalid.folderstructure", child.getParentFile().getAbsolutePath()));
                     return null;
-                }
+                }*/
 
             }
 

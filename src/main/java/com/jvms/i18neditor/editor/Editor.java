@@ -469,9 +469,8 @@ public class Editor extends JFrame {
         String localeString = "";
         while (localeString != null) {
             localeString = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.locale.add.title"), MessageBundle.get("dialogs.locale.add.text"), null, JOptionPane.QUESTION_MESSAGE).trim();
-            Locale locale = LocaleUtils.toLocale(localeString);
 
-            if (!isLocaleAvailable(locale)) {
+            if (!Utils.isLocaleAvailable(localeString)) {
                 Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
             } else {
                 TranslationTreeNode node = translationTree.getSelectionNode();
@@ -835,10 +834,7 @@ public class Editor extends JFrame {
         });
     }
 
-    private boolean isLocaleAvailable(Locale locale) {
 
-        return Arrays.asList(Locale.getAvailableLocales()).contains(locale);
-    }
 
     private void setupGlobalKeyEventDispatcher() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
