@@ -71,7 +71,7 @@ public class TranslationTree extends JTree {
         TranslationTreeModel model = (TranslationTreeModel) getModel();
         TranslationTreeNode node = model.getNodeByKey(key);
         if (node == null) {
-            TranslationTreeNode parent = (TranslationTreeNode) model.getClosestParentNodeByKey(key);
+            TranslationTreeNode parent =  model.getClosestParentNodeByKey(key);
             String newKey = ResourceKeys.childKey(key, parent.getKey());
             String firstPart = ResourceKeys.firstPart(newKey);
             String lastPart = ResourceKeys.withoutFirstPart(newKey);

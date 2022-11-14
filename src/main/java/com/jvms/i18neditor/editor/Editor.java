@@ -53,11 +53,7 @@ public class Editor extends JFrame {
     public static final String SETTINGS_FILE = ".i18n-editor";
     public static final String SETTINGS_DIR = System.getProperty("user.home");
     public static final Locale DEFAULT_LANGUAGE = Locale.ENGLISH;
-    protected static final List<Locale> SUPPORTED_LANGUAGES = Lists.newArrayList(
-            new Locale("en"),
-            new Locale("nl"),
-            new Locale("pt", "BR"),
-            new Locale("es", "ES"));
+    protected static final List<Locale> SUPPORTED_LANGUAGES = Lists.newArrayList(new Locale("en"), new Locale("nl"), new Locale("pt", "BR"), new Locale("es", "ES"));
     private static final long serialVersionUID = 1113029729495390082L;
     private static final Logger log = LoggerFactory.getLogger(Editor.class);
     private EditorSettings settings = new EditorSettings();
@@ -93,10 +89,7 @@ public class Editor extends JFrame {
     }
 
     public void changePathFolder() {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                MessageBundle.get("dialogs.change.path.text"),
-                MessageBundle.get("dialogs.change.path.title"),
-                JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.change.path.text"), MessageBundle.get("dialogs.change.path.title"), JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle(MessageBundle.get("dialogs.project.change.path.title"));
@@ -109,10 +102,7 @@ public class Editor extends JFrame {
                     FileUtils.copyDirectory(new File(pathOld), new File(fc.getSelectedFile().getPath()));
                     importProject(Paths.get(fc.getSelectedFile().getPath()), null);
                     FileUtils.forceDelete(new File(pathOld));
-                    JOptionPane.showMessageDialog(this,
-                            MessageBundle.get("dialogs.change.success"),
-                            MessageBundle.get("dialogs.change.title"),
-                            JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, MessageBundle.get("dialogs.change.success"), MessageBundle.get("dialogs.change.title"), JOptionPane.INFORMATION_MESSAGE);
                     //eliminando pathOld del history
                     List<String> recentList = settings.getHistory();
                     recentList.remove(pathOld);
@@ -128,17 +118,11 @@ public class Editor extends JFrame {
 
 
     public void restoreToDefaultProject() {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                MessageBundle.get("dialogs.restore.text"),
-                MessageBundle.get("dialogs.restore.confirmation.title"),
-                JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.restore.text"), MessageBundle.get("dialogs.restore.confirmation.title"), JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             File fileToDeleted = new File(SETTINGS_DIR, SETTINGS_FILE);
             if (fileToDeleted.delete()) {
-                JOptionPane.showMessageDialog(this,
-                        MessageBundle.get("dialogs.restore.success"),
-                        MessageBundle.get("dialogs.restore.title"),
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, MessageBundle.get("dialogs.restore.success"), MessageBundle.get("dialogs.restore.title"), JOptionPane.INFORMATION_MESSAGE);
                 EditorSettings settingsa = new EditorSettings();
                 settingsa.setResourceFileDefinition(settings.getResourceFileDefinition());
                 settingsa.setResourceFileStructure(settings.getResourceFileStructure());
@@ -159,10 +143,7 @@ public class Editor extends JFrame {
     public void showFindByLanguageDialog() {
         String key = "";
         while (key != null) {
-            key = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.translation.language.find.title"),
-                    MessageBundle.get("dialogs.translation.language.find.text"),
-                    null, JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
+            key = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.translation.language.find.title"), MessageBundle.get("dialogs.translation.language.find.text"), null, JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
                        /* if(key.equals(""))
                                    {
                                        Dialogs.showWarningDialog(this,
@@ -199,9 +180,7 @@ public class Editor extends JFrame {
                 }
                 editorMenu.setEnableClearSearch(true);
                 if (!flag) {
-                    Dialogs.showWarningDialog(this,
-                            MessageBundle.get("dialogs.translation.language.find.title"),
-                            MessageBundle.get("dialogs.translation.language.find.error"));
+                    Dialogs.showWarningDialog(this, MessageBundle.get("dialogs.translation.language.find.title"), MessageBundle.get("dialogs.translation.language.find.error"));
                 }
                 key = null;
             }
@@ -281,7 +260,6 @@ public class Editor extends JFrame {
 
             //Obtain all paths that containt the key
             List<String> paths = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey()));
-
             removeTranslation(node.getKey(), node);
             Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
             translationTree.setSelectionNode(parent);
@@ -327,8 +305,7 @@ public class Editor extends JFrame {
         Locale locale = Locales.parseLocale(localeString);
 
         try {
-            Resource resource = Resources.create(project.getResourceType(), path,
-                    project.getResourceFileDefinition(), project.getResourceFileStructure(), locale);
+            Resource resource = Resources.create(project.getResourceType(), path, project.getResourceFileDefinition(), project.getResourceFileStructure(), locale);
             addResource(resource);
 
             LogParameters params = new LogParameters("", project.getPath().toAbsolutePath().toString(), 'C', MessageBundle.get("log.add.locale") + localeString);
@@ -348,41 +325,31 @@ public class Editor extends JFrame {
             showError(MessageBundle.get("dialogs.translation.key.error"));
             return false;
         }
+
         TranslationTreeNode node = translationTree.getNodeByKey(key);
+
         if (node != null) {
             //translationTree.setSelectionNode(node);
-            JOptionPane.showMessageDialog(this,
-                    MessageBundle.get("dialogs.create.branch"),
-                    MessageBundle.get("dialogs.branch.title"),
-                    JOptionPane.YES_OPTION);
+            JOptionPane.showMessageDialog(this, MessageBundle.get("dialogs.create.branch"), MessageBundle.get("dialogs.branch.title"), JOptionPane.YES_OPTION);
             return false;
         } else if (!confirmNewTranslation(key)) {
             return false;
         }
         if (project != null) {
-            String path = Utils.construcPathByNodes(key, project.getPath().toString(), translationTree);
-            project.getResources()
-                    .stream()
-                    .filter(x -> x.getPath().toAbsolutePath().toString().contains(path))
-
-                    .forEach(
-                            resource ->
-                                    resource.storeTranslation(key, "")
-                    );
+            String path = Utils.getPathOfNode(translationTree.getSelectionNode(), project).toString();
+            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.storeTranslation(key, ""));
         }
         translationTree.addNodeByKey(key);
-        Utils.writeLogsByNameKey(project, key, 'A', MessageBundle.get("log.add.translation") + key);
+        //   Utils.writeLogsByNameKey(project, key, 'A', MessageBundle.get("log.add.translation") + key);
         requestFocusInFirstResourceField();
         return true;
     }
 
     public void removeTranslation(String key, TranslationTreeNode node) {
         if (project != null) {
-            String path = Utils.construcPathByNodes(key, project.getPath().toString(), translationTree);
+            String path = Utils.getPathOfNode(node, project).toString();
 
-            project.getResources().
-                    stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).
-                    forEach(resource -> resource.removeTranslation(Utils.restoreStringTrunk(node, key)));
+            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(Utils.restoreStringTrunk(node, key)));
         }
         translationTree.removeNodeByKey(key);
         requestFocusInFirstResourceField();
@@ -403,8 +370,7 @@ public class Editor extends JFrame {
             return false;
         }
         if (project != null) {
-            project.getResources().
-                    forEach(resource -> resource.renameTranslation(finalKey, finalNewKey));
+            project.getResources().forEach(resource -> resource.renameTranslation(finalKey, finalNewKey));
         }
         translationTree.renameNodeByKey(key, newKey);
         requestFocusInFirstResourceField();
@@ -483,6 +449,7 @@ public class Editor extends JFrame {
 //        }
 //    }
 
+
     public void showImportProjectDialog() {
         String path = null;
         if (project != null) {
@@ -501,17 +468,14 @@ public class Editor extends JFrame {
 
         String localeString = "";
         while (localeString != null) {
-            localeString = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.locale.add.title"),
-                    MessageBundle.get("dialogs.locale.add.text"),
-                    null, JOptionPane.QUESTION_MESSAGE).trim();
-            Locale locale = new Locale.Builder().setLanguageTag(localeString).build();
+            localeString = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.locale.add.title"), MessageBundle.get("dialogs.locale.add.text"), null, JOptionPane.QUESTION_MESSAGE).trim();
+            Locale locale = LocaleUtils.toLocale(localeString);
 
-            if (!LocaleUtils.isAvailableLocale(locale)) {
+            if (!isLocaleAvailable(locale)) {
                 Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
             } else {
                 TranslationTreeNode node = translationTree.getSelectionNode();
-                Path path = Utils.retunPathByTypeofNode(node, project, translationTree);
+                Path path = Utils.getPathOfNode(node, project);
                 if (node.isRoot()) {
                     path = project.getPath();
 
@@ -532,11 +496,7 @@ public class Editor extends JFrame {
         String key = node.getKey();
         String newKey = "";
         while (newKey != null) {
-            newKey = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.translation.rename.title"),
-                    MessageBundle.get("dialogs.translation.rename.text"),
-                    MessageBundle.get("dialogs.translation.add.help"),
-                    JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
+            newKey = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.translation.rename.title"), MessageBundle.get("dialogs.translation.rename.text"), MessageBundle.get("dialogs.translation.add.help"), JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
             if (newKey != null) {
                 boolean result = renameTranslation(key, newKey.trim(), node);
                 if (result) {
@@ -546,26 +506,10 @@ public class Editor extends JFrame {
         }
     }
 
-    public void showDuplicateTranslationDialog(String key) {
-        String newKey = "";
-        while (newKey != null) {
-            newKey = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.translation.duplicate.title"),
-                    MessageBundle.get("dialogs.translation.duplicate.text"),
-                    MessageBundle.get("dialogs.translation.add.help"),
-                    JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
-            if (newKey != null) {
-                boolean result = addTranslation(newKey.trim());
-                if (result) {
-                    break;
-                }
-            }
-        }
-    }
 
     public void showAddTranslationDialog(TranslationTreeNode node) {
         if (node.typeFile == TypeFile.FOLDER) {
-            Path path = Utils.retunPathByTypeofNode(node, project, translationTree);
+            Path path = Utils.getPathOfNode(node, project);
             if (node.isRoot()) {
                 path = project.getPath();
 
@@ -580,12 +524,9 @@ public class Editor extends JFrame {
         if (node != null && !node.isRoot()) {
             key = node.getKey() + ".";
         }
+
         while (newKey != null) {
-            newKey = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.translation.add.title"),
-                    MessageBundle.get("dialogs.translation.add.text"),
-                    MessageBundle.get("dialogs.translation.add.help"),
-                    JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
+            newKey = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.translation.add.title"), MessageBundle.get("dialogs.translation.add.text"), MessageBundle.get("dialogs.translation.add.help"), JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
             if (newKey != null) {
                 boolean result = addTranslation(newKey.trim());
                 if (result) {
@@ -599,16 +540,11 @@ public class Editor extends JFrame {
     public void showFindTranslationDialog() {
         String key = "";
         while (key != null) {
-            key = Dialogs.showInputDialog(this,
-                    MessageBundle.get("dialogs.translation.find.title"),
-                    MessageBundle.get("dialogs.translation.find.text"),
-                    null, JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
+            key = Dialogs.showInputDialog(this, MessageBundle.get("dialogs.translation.find.title"), MessageBundle.get("dialogs.translation.find.text"), null, JOptionPane.QUESTION_MESSAGE, key, new TranslationKeyCaret());
             if (key != null) {
                 TranslationTreeNode node = translationTree.getNodeByKey(key.trim());
                 if (node == null) {
-                    Dialogs.showWarningDialog(this,
-                            MessageBundle.get("dialogs.translation.find.title"),
-                            MessageBundle.get("dialogs.translation.find.error"));
+                    Dialogs.showWarningDialog(this, MessageBundle.get("dialogs.translation.find.title"), MessageBundle.get("dialogs.translation.find.error"));
                 } else {
                     translationTree.setSelectionNode(node);
                     break;
@@ -618,13 +554,7 @@ public class Editor extends JFrame {
     }
 
     public void showAboutDialog() {
-        Dialogs.showHtmlDialog(this, MessageBundle.get("dialogs.about.title", TITLE),
-                "<img src=\"" + Images.getClasspathURL("images/icon-48.png") + "\"><br>" +
-                        "<span style=\"font-size:1.3em;\"><strong>" + TITLE + "</strong></span><br>" +
-                        VERSION + "<br><br>" +
-                        "Copyright (c) 2015 - 2018<br>" +
-                        "Jacob van Mourik<br>" +
-                        "MIT Licensed");
+        Dialogs.showHtmlDialog(this, MessageBundle.get("dialogs.about.title", TITLE), "<img src=\"" + Images.getClasspathURL("images/icon-48.png") + "\"><br>" + "<span style=\"font-size:1.3em;\"><strong>" + TITLE + "</strong></span><br>" + VERSION + "<br><br>" + "Copyright (c) 2015 - 2018<br>" + "Jacob van Mourik<br>" + "MIT Licensed");
     }
 
     public void showVersionDialog(boolean newVersionOnly) {
@@ -637,9 +567,7 @@ public class Editor extends JFrame {
                 data = null;
             }
             if (data != null && VERSION.compareToIgnoreCase(data.getTagName()) < 0) {
-                content = MessageBundle.get("dialogs.version.new") + " " +
-                        "<strong>" + data.getTagName() + "</strong><br>" +
-                        "<a href=\"" + data.getHtmlUrl() + "\">" + MessageBundle.get("dialogs.version.link") + "</a>";
+                content = MessageBundle.get("dialogs.version.new") + " " + "<strong>" + data.getTagName() + "</strong><br>" + "<a href=\"" + data.getHtmlUrl() + "\">" + MessageBundle.get("dialogs.version.link") + "</a>";
             } else if (!newVersionOnly) {
                 content = MessageBundle.get("dialogs.version.uptodate");
             } else {
@@ -652,10 +580,7 @@ public class Editor extends JFrame {
     public boolean closeCurrentProject() {
         boolean result = true;
         if (dirty) {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    MessageBundle.get("dialogs.save.text"),
-                    MessageBundle.get("dialogs.save.title"),
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.save.text"), MessageBundle.get("dialogs.save.title"), JOptionPane.YES_NO_CANCEL_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 result = saveProject();
             } else {
@@ -721,10 +646,7 @@ public class Editor extends JFrame {
         if (project != null && project.hasResources()) {
             // Restore last expanded nodes
             List<String> expandedKeys = settings.getLastExpandedNodes();
-            List<TranslationTreeNode> expandedNodes = expandedKeys.stream()
-                    .map(translationTree::getNodeByKey)
-                    .filter(n -> n != null)
-                    .collect(Collectors.toList());
+            List<TranslationTreeNode> expandedNodes = expandedKeys.stream().map(translationTree::getNodeByKey).filter(n -> n != null).collect(Collectors.toList());
             translationTree.expand(expandedNodes);
             // Restore last selected node
             String selectedKey = settings.getLastSelectedNode();
@@ -748,8 +670,7 @@ public class Editor extends JFrame {
 
             Locale locale = field.getResource().getLocale();
             String label = locale != null ? locale.getDisplayName() : MessageBundle.get("resources.locale.default");
-            field.setEnabled(selectedNode != null && selectedNode.isEditable() &&
-                    (selectedNode.isLeaf() || field.getResource().supportsParentValues()));
+            field.setEnabled(selectedNode != null && selectedNode.isEditable() && (selectedNode.isLeaf() || field.getResource().supportsParentValues()));
             field.setRows(settings.getDefaultInputHeight());
             resourcesPanel.add(Box.createVerticalStrut(5));
             JLabel jLabel = new JLabel(label);
@@ -791,10 +712,7 @@ public class Editor extends JFrame {
         TranslationTreeNode oldNode = translationTree.getNodeByKey(oldKey);
         if (newNode != null) {
             boolean isReplace = newNode.isLeaf() || oldNode.isLeaf();
-            boolean confirm = Dialogs.showConfirmDialog(this,
-                    MessageBundle.get("dialogs.translation.conflict.title"),
-                    MessageBundle.get("dialogs.translation.conflict.text." + (isReplace ? "replace" : "merge")),
-                    JOptionPane.WARNING_MESSAGE);
+            boolean confirm = Dialogs.showConfirmDialog(this, MessageBundle.get("dialogs.translation.conflict.title"), MessageBundle.get("dialogs.translation.conflict.text." + (isReplace ? "replace" : "merge")), JOptionPane.WARNING_MESSAGE);
             if (!confirm) {
                 return false;
             }
@@ -815,10 +733,7 @@ public class Editor extends JFrame {
                     return !Strings.isNullOrEmpty(r.getTranslation(node.getKey()));
                 });
                 if (hasValue) {
-                    return Dialogs.showConfirmDialog(this,
-                            MessageBundle.get("dialogs.translation.overwrite.title"),
-                            MessageBundle.get("dialogs.translation.overwrite.text", node.getKey()),
-                            JOptionPane.WARNING_MESSAGE);
+                    return Dialogs.showConfirmDialog(this, MessageBundle.get("dialogs.translation.overwrite.title"), MessageBundle.get("dialogs.translation.overwrite.text", node.getKey()), JOptionPane.WARNING_MESSAGE);
                 }
             }
             key = ResourceKeys.withoutLastPart(key);
@@ -844,9 +759,7 @@ public class Editor extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new EditorWindowListener());
 
-        setIconImages(Lists.newArrayList("512", "256", "128", "64", "48", "32", "24", "20", "16").stream()
-                .map(size -> Images.loadFromClasspath("images/icon-" + size + ".png").getImage())
-                .collect(Collectors.toList()));
+        setIconImages(Lists.newArrayList("512", "256", "128", "64", "48", "32", "24", "20", "16").stream().map(size -> Images.loadFromClasspath("images/icon-" + size + ".png").getImage()).collect(Collectors.toList()));
 
         translationTree = new TranslationTree();
         translationTree.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -855,9 +768,7 @@ public class Editor extends JFrame {
 
         translationField = new TranslationKeyField();
         translationField.addKeyListener(new TranslationFieldKeyListener());
-        translationField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 0, 0, 1, borderColor),
-                ((CompoundBorder) translationField.getBorder()).getInsideBorder()));
+        translationField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 1, borderColor), ((CompoundBorder) translationField.getBorder()).getInsideBorder()));
 
         JScrollPane translationsScrollPane = new JScrollPane(translationTree);
         translationsScrollPane.getViewport().setOpaque(false);
@@ -892,8 +803,7 @@ public class Editor extends JFrame {
             resourcesPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 20));
         }
 
-        introText = new JLabel("<html><body style=\"text-align:center; padding:30px;\">" +
-                MessageBundle.get("core.intro.text") + "</body></html>");
+        introText = new JLabel("<html><body style=\"text-align:center; padding:30px;\">" + MessageBundle.get("core.intro.text") + "</body></html>");
         introText.setOpaque(true);
         introText.setFont(introText.getFont().deriveFont(28f));
         introText.setHorizontalTextPosition(JLabel.CENTER);
@@ -925,11 +835,14 @@ public class Editor extends JFrame {
         });
     }
 
+    private boolean isLocaleAvailable(Locale locale) {
+
+        return Arrays.asList(Locale.getAvailableLocales()).contains(locale);
+    }
+
     private void setupGlobalKeyEventDispatcher() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
-            if (e.getID() != KeyEvent.KEY_PRESSED || !e.isAltDown() ||
-                    (SystemUtils.IS_OS_MAC && !e.isMetaDown()) ||
-                    (!SystemUtils.IS_OS_MAC && !e.isShiftDown())) {
+            if (e.getID() != KeyEvent.KEY_PRESSED || !e.isAltDown() || (SystemUtils.IS_OS_MAC && !e.isMetaDown()) || (!SystemUtils.IS_OS_MAC && !e.isShiftDown())) {
                 return false;
             }
             TreePath selected = translationTree.getSelectionPath();
@@ -1020,10 +933,7 @@ public class Editor extends JFrame {
 
     private void updateTreeNodeStatuses() {
         if (project == null) return;
-        Set<String> keys = project.getResources().stream()
-                .flatMap(r -> r.getTranslations().keySet().stream())
-                .filter(key -> project.getResources().stream().anyMatch(r -> !r.hasTranslation(key)))
-                .collect(Collectors.toSet());
+        Set<String> keys = project.getResources().stream().flatMap(r -> r.getTranslations().keySet().stream()).filter(key -> project.getResources().stream().anyMatch(r -> !r.hasTranslation(key))).collect(Collectors.toSet());
         translationTree.updateNodes(keys);
     }
 
@@ -1038,10 +948,7 @@ public class Editor extends JFrame {
             try {
                 Resources.write(resource, !project.isMinifyResources(), project.isFlattenJSON());
             } catch (ChecksumException e) {
-                boolean confirm = Dialogs.showConfirmDialog(this,
-                        MessageBundle.get("dialogs.save.checksum.title"),
-                        MessageBundle.get("dialogs.save.checksum.text", resource.getPath()),
-                        JOptionPane.WARNING_MESSAGE);
+                boolean confirm = Dialogs.showConfirmDialog(this, MessageBundle.get("dialogs.save.checksum.title"), MessageBundle.get("dialogs.save.checksum.text", resource.getPath()), JOptionPane.WARNING_MESSAGE);
                 if (confirm) {
                     resource.setChecksum(null);
                     saveResource(resource);
@@ -1117,9 +1024,7 @@ public class Editor extends JFrame {
         }
         if (project != null) {
             // Store keys of expanded nodes
-            List<String> expandedNodeKeys = translationTree.getExpandedNodes().stream()
-                    .map(TranslationTreeNode::getKey)
-                    .collect(Collectors.toList());
+            List<String> expandedNodeKeys = translationTree.getExpandedNodes().stream().map(TranslationTreeNode::getKey).collect(Collectors.toList());
             props.setProperty("last_expanded", expandedNodeKeys);
             // Store key of selected node
             TranslationTreeNode selectedNode = translationTree.getSelectionNode();
@@ -1191,34 +1096,29 @@ public class Editor extends JFrame {
 
                 // Update UI values
                 String key = node.getKey();
+
+
                 translationField.setValue(key);
                 resourceFields.forEach(x -> {
-                            if (node.typeFile != TypeFile.ELEMENT) {
-                                resourcesPanel.setVisible(false);
-                            } else if (x.getResource().getPath().toString().contains(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree))) {
-                                resourcesPanel.setVisible(true);
-                                x.setVisible(true);
-                                jLabels.get(x).setVisible(true);
-                            } else {
-                                x.setVisible(false);
-                                jLabels.get(x).setVisible(false);
-                            }
-                        }
-                );
 
+                    if (node.typeFile != TypeFile.ELEMENT) {
+                        resourcesPanel.setVisible(false);
+                    } else if (x.getResource().getPath().getParent().getParent().toString().equals(Utils.getPathOfNode(node, project).toString())
 
-                resourceFields.
-                        stream().
-                        filter(x -> x.getResource().getPath().toString().contains(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree)))
-                        .forEach(f -> {
-                            f.setVisible(true);
+                    ) {
+                        resourcesPanel.setVisible(true);
+                        x.setVisible(true);
+                        jLabels.get(x).setVisible(true);
+                        String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
+                        x.setValue(trunkateKey);
+                        x.setEnabled(node.isEditable() && (node.isLeaf() || x.getResource().supportsParentValues()));
+                    } else {
 
-                            //Trunkate the key based on his parent
-                            String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
-                            f.setValue(trunkateKey);
-                            f.setEnabled(node.isEditable() && (node.isLeaf() || f.getResource().supportsParentValues()));
+                        x.setVisible(false);
+                        jLabels.get(x).setVisible(false);
+                    }
+                });
 
-                        });
 
                 // Restore scroll position and foc
                 SwingUtilities.invokeLater(() -> resourcesScrollPane.getVerticalScrollBar().setValue(scrollValue));

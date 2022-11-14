@@ -159,6 +159,7 @@ public final class Resources {
      * @param plainKeys
      * @throws IOException if an I/O error occurs writing the file.
      */
+
     public static void write(Resource resource, boolean prettyPrinting, boolean flattenKeys) throws IOException {
 
         if (resource.getChecksum() != null) {
@@ -172,7 +173,7 @@ public final class Resources {
         if (type == ResourceType.Properties) {
             ExtendedProperties content = toProperties(resource.getTranslations());
 
-            content.store(resource.getPath());
+           content.store(resource.getPath());
         } else {
             if (resource.getPath().toFile().exists()) {
                 Utils.compareJsonString(Optional.ofNullable(FileUtils.readFileToString(resource.getPath().toFile(), StandardCharsets.UTF_8)), toJson(resource, prettyPrinting, flattenKeys), resource.getPath());
@@ -208,6 +209,7 @@ public final class Resources {
      */
     public static Resource create(ResourceType type, Path root, String fileDefinition, FileStructure structure, Locale locale)
             throws IOException {
+
         String extension = ".json";
         Path path;
         String more = "i18n";

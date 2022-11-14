@@ -9,10 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.editor.Editor;
-import com.jvms.i18neditor.editor.EditorProject;
-import com.jvms.i18neditor.editor.TranslationTree;
-import com.jvms.i18neditor.editor.TranslationTreeNode;
+import com.jvms.i18neditor.editor.*;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +20,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -57,22 +57,61 @@ public class Utils {
 
     }
 
-    public static Path retunPathByTypeofNode(TranslationTreeNode node, EditorProject project, TranslationTree translationTree) {
-
-        //if is null then is root
-        if (node == null) {
-            return project.getPath();
+    public static Path findDirectoryWithSameName(String name, File root) {
+        Path result = null;
+        if (name.equals("")) {
+            return root.toPath();
+        }
+        for (File file : root.listFiles()) {
+            if (file.isDirectory()) {
+                if (file.getName().equals(name)) {
+                    return file.toPath();
+                }
+                result = findDirectoryWithSameName(name, file);
+            }
         }
 
-     /*   if (node.typeFile == TypeFile.FOLDER) {
-            return Paths.get(Utils.construcPathByNodes(node.getKey(), project.getPath().toString(), translationTree));
-        }*/
-
-        Path path = Paths.get(Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0));
-        return path.getParent();
+        return result;
 
 
     }
+
+    public static Path getPathOfNode(TranslationTreeNode node, EditorProject project) {
+       if (node.typeFile == TypeFile.FOLDER) {
+            String key = node.getKey();
+
+            return findDirectoryWithSameName(key, project.getPath().toFile());
+        }
+
+       String stringpath = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0);
+       Path path = Paths.get(stringpath).getParent();
+        if ("i18n".equals(path.toFile().getName())) {
+            return path.getParent();
+        }
+        return path;
+
+
+    }
+public static boolean ads(ResourceField x, TranslationTreeNode node, EditorProject project){
+
+  return   x.getResource().getPath().getParent().getParent().toString()
+            .equals(Utils.getPathOfNode(node, project).toString());
+}
+//    public static Path retunPathByTypeofNode(TranslationTreeNode node, EditorProject project, TranslationTree translationTree) {
+//
+//        //if is null then is root
+//        if (node == null) {
+//            return project.getPath();
+//        }
+//
+//
+//
+//        Path path = Paths.get(Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0));
+//
+//        return path.getParent();
+//
+//
+//    }
 
     public static List<String> getAllPathFromKeys(EditorProject project, String nameKey) {
 
@@ -95,8 +134,17 @@ public class Utils {
 
 
     public static String restoreStringTrunk(TranslationTreeNode node, String key) {
-        return key.replaceFirst(getNameTrunk(node) + ".", "");
+        TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
+        if (parent.getParent() == null) {
+            return key.replaceFirst(node.getName() + ".", "");
+        }
 
+        if (key.contains(".")) {
+
+            return key.replaceFirst(getNameTrunk(node) + ".", "");
+        } else {
+            return key;
+        }
     }
 
     public static void writeLogsByNameKey(EditorProject project, String nameKey, char operation, String message) {
@@ -136,20 +184,20 @@ public class Utils {
 
     }
 
-    public static String construcPathByNodes(String name, String path, TranslationTree translationTree) {
-
-        //Obtain the last element that is a leaf
-        String parentKey = name.replaceAll("." + Files.getFileExtension(name), "");
-        //replace to key to obtain the father
-        parentKey = getNameTrunk(translationTree.getNodeByKey(parentKey));
-        //Convert String to path
-        final Path[] objec = {Paths.get(path)};
-        //Replace every . in the key to create the path
-        Arrays.stream(parentKey.split("\\.")).forEach(x -> objec[0] = objec[0].resolve(x));
-        return objec[0].resolve("i18n").toString();
-
-
-    }
+//    public static String construcPathByNodes(String name, String path, TranslationTree translationTree) {
+//
+//        //Obtain the last element that is a leaf
+//        String parentKey = name.replaceAll("." + Files.getFileExtension(name), "");
+//        //replace to key to obtain the father
+//        parentKey = getNameTrunk(translationTree.getNodeByKey(parentKey));
+//        //Convert String to path
+//        final Path[] objec = {Paths.get(path)};
+//        //Replace every . in the key to create the path
+//        Arrays.stream(parentKey.split("\\.")).forEach(x -> objec[0] = objec[0].resolve(x));
+//        return objec[0].resolve("i18n").toString();
+//
+//
+//    }
 
 
     public static String getNameTrunk(TreeNode node) {
@@ -277,6 +325,6 @@ public class Utils {
 
     public static String transformKeyByPathinResources(String key, Path path) {
         String nameOfFOlder = path.getParent().getParent().toFile().getName();
-                 return key.replaceAll(".*"+ nameOfFOlder+"\\.","");
+        return key.replaceAll(".*" + nameOfFOlder + "\\.", "");
     }
 }
