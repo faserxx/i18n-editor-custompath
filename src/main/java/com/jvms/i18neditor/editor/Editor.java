@@ -952,7 +952,7 @@ public class Editor extends JFrame {
         props.setProperty("minify_resources", project.isMinifyResources());
         props.setProperty("flatten_json", project.isFlattenJSON());
         props.setProperty("resource_type", ResourceType.JSON);
-        props.setProperty("resource_definition", project.getResourceFileDefinition());
+        props.setProperty("resource_definition", EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION);
         props.setProperty("resource_structure", project.getResourceFileStructure());
         props.store(Paths.get(project.getPath().toString(), PROJECT_FILE));
 
@@ -968,12 +968,12 @@ public class Editor extends JFrame {
             project.setResourceType(props.getEnumProperty("resource_type", ResourceType.class));
             String resourceName = props.getProperty("resource_name"); // for backwards compatibility
             if (Strings.isNullOrEmpty(resourceName)) {
-                project.setResourceFileDefinition(props.getProperty("resource_definition", settings.getResourceFileDefinition()));
+                project.setResourceFileDefinition(props.getProperty("resource_definition", EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION));
                 project.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, settings.getResourceFileStructure()));
             } else {
                 // for backwards compatibility
                 project.setResourceFileDefinition(resourceName);
-                project.setResourceFileStructure(project.getResourceType() == ResourceType.Properties ? FileStructure.Flat : FileStructure.Folder);
+                project.setResourceFileStructure(project.getResourceType() == ResourceType.Properties ? FileStructure.Flat : FileStructure.Nested);
             }
         } else {
             project.setMinifyResources(settings.isMinifyResources());
@@ -992,7 +992,7 @@ public class Editor extends JFrame {
         props.setProperty("window_div_pos", contentPane.getDividerLocation());
         props.setProperty("minify_resources", settings.isMinifyResources());
         props.setProperty("flatten_json", settings.isFlattenJSON());
-        props.setProperty("resource_definition", settings.getResourceFileDefinition());
+        props.setProperty("resource_definition", EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION);
         props.setProperty("resource_structure", settings.getResourceFileStructure());
         props.setProperty("check_version", settings.isCheckVersionOnStartup());
         props.setProperty("default_input_height", settings.getDefaultInputHeight());
@@ -1033,8 +1033,7 @@ public class Editor extends JFrame {
         settings.setHistory(props.getListProperty("history"));
         settings.setLastExpandedNodes(props.getListProperty("last_expanded"));
         settings.setLastSelectedNode(props.getProperty("last_selected"));
-        settings.setResourceFileDefinition(props.getProperty("resource_definition", EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION));
-        settings.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, FileStructure.Flat));
+         settings.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, FileStructure.Flat));
         settings.setEditorLanguage(props.getLocaleProperty("editor_language"));
         settings.setCloseInError(props.getBooleanProperty("close_in_error", false));
     }
@@ -1093,7 +1092,7 @@ public class Editor extends JFrame {
                         x.setVisible(true);
                         jLabels.get(x).setVisible(true);
                         x.setValue(key);
-                        if (project.getResourceFileStructure() == FileStructure.Folder) {
+                        if (project.getResourceFileStructure() == FileStructure.Nested) {
                             String trunkateKey = key.replace(Utils.getNameTrunk(node) + ".", "");
                             x.setValue(trunkateKey);
                         }
