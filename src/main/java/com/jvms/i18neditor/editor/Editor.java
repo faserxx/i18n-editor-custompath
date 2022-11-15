@@ -245,14 +245,14 @@ public class Editor extends JFrame {
         TranslationTreeNode node = translationTree.getSelectionNode();
         if (node != null && !node.isRoot()) {
             TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
-
+            
+            String key = project.getResourceFileStructure() == FileStructure.Flat ? node.getKey(): Utils.restoreStringTrunk(node, node.getKey()) ;
+            
             //Obtain all paths that containt the key
-            List<String> paths = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey()));
+            List<String> paths = Utils.getAllPathFromKeys(project,key );
             removeTranslation(node.getKey(), node);
             Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
             translationTree.setSelectionNode(parent);
-
-
         }
     }
 
@@ -282,7 +282,6 @@ public class Editor extends JFrame {
 
         }
     }
-
 
     public boolean addLocale(Path path, String localeString) {
 
@@ -337,7 +336,9 @@ public class Editor extends JFrame {
         if (project != null) {
             String path = Utils.getPathOfNode(node, project).toString();
 
-            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(Utils.restoreStringTrunk(node, key)));
+            String keyName = project.getResourceFileStructure() == FileStructure.Flat ? key: Utils.restoreStringTrunk(node, node.getKey()) ;
+            
+            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(keyName));
         }
         translationTree.removeNodeByKey(key);
         requestFocusInFirstResourceField();

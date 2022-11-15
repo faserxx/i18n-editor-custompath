@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.jvms.i18neditor.FileStructure;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.editor.EditorProject;
-import com.jvms.i18neditor.editor.ResourceField;
 import com.jvms.i18neditor.editor.TranslationTreeNode;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import org.apache.commons.io.FilenameUtils;
@@ -148,9 +147,8 @@ public class Utils {
         if (parent.getParent() == null) {
             return key.replaceFirst(node.getName() + ".", "");
         }
-
-        if (key.contains(".")) {
-
+        
+        if (key.contains(".") ) {
             return key.replaceFirst(getNameTrunk(node) + ".", "");
         } else {
             return key;
