@@ -71,7 +71,6 @@ public class Editor extends JFrame {
     private Set<ResourceField> resourceFields = new HashSet<>();
     private Map<ResourceField, JLabel> jLabels = new HashMap<>();
 
-
 //    public void createProject(Path dir, ResourceType type) {
 //        File folder = new File(dir.toString(),"i18n");
 //        folder.mkdirs();
@@ -242,17 +241,20 @@ public class Editor extends JFrame {
     }
 
     public void removeSelectedTranslation() {
-        TranslationTreeNode node = translationTree.getSelectionNode();
-        if (node != null && !node.isRoot()) {
-            TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
-            
-            String key = project.getResourceFileStructure() == FileStructure.Flat ? node.getKey(): Utils.restoreStringTrunk(node, node.getKey()) ;
-            
-            //Obtain all paths that containt the key
-            List<String> paths = Utils.getAllPathFromKeys(project,key );
-            removeTranslation(node.getKey(), node);
-            Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
-            translationTree.setSelectionNode(parent);
+        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.translation.remove.title"), MessageBundle.get("dialogs.translation.remove.title"), JOptionPane.YES_NO_CANCEL_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {        
+            TranslationTreeNode node = translationTree.getSelectionNode();
+            if (node != null && !node.isRoot()) {
+                TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
+
+                String key = project.getResourceFileStructure() == FileStructure.Flat ? node.getKey(): Utils.restoreStringTrunk(node, node.getKey()) ;
+
+                //Obtain all paths that containt the key
+                List<String> paths = Utils.getAllPathFromKeys(project,key );
+                removeTranslation(node.getKey(), node);
+                Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
+                translationTree.setSelectionNode(parent);
+            }
         }
     }
 
@@ -333,15 +335,17 @@ public class Editor extends JFrame {
     }
 
     public void removeTranslation(String key, TranslationTreeNode node) {
+
         if (project != null) {
             String path = Utils.getPathOfNode(node, project).toString();
 
             String keyName = project.getResourceFileStructure() == FileStructure.Flat ? key: Utils.restoreStringTrunk(node, node.getKey()) ;
-            
+
             project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(keyName));
         }
         translationTree.removeNodeByKey(key);
         requestFocusInFirstResourceField();
+        
     }
 
     public boolean renameTranslation(String key, String newKey, TranslationTreeNode node) {
