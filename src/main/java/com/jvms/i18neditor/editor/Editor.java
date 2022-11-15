@@ -151,19 +151,37 @@ public class Editor extends JFrame {
                                    }
                         else
                                    {*/
-            if (!key.equals("")) {
+            if (key!= null) {
                 List<Resource> resources = project.getResources();  //Getting resource list
                 Boolean flag = false;
+                List<Path> listPath = Lists.newArrayList();
                 for (int i = 0; i < resources.size(); i++) //looping through list of resources to select the one that belongs to the selected language
                 {
-                    Locale l = resources.get(i).getLocale(); //getting the Locale of each resource
-                    if (l != null) {
-                        if (l.getLanguage().contains(key)) //checking the language of each locale to add the searched resource to the list
+                    File file=resources.get(i).getPath().toFile();
+                    String baseName=Utils.getBaseName(file);                 
+                    if (baseName != null) {
+                        if(baseName.equals(key)) //checking the language of each locale to add the searched resource to the list
                         {
                             flag = true;
-                            Path testPath = resources.get(i).getPath();
+                            Path dirLanguage = resources.get(i).getPath();
+                            listPath.add(dirLanguage);
+                        }
+                    }
+                }
+                Path pathProject = project.getPath();
+                importProject(pathProject, listPath);
+                
+               /* for (int i = 0; i < resources.size(); i++) //looping through list of resources to select the one that belongs to the selected language
+                {
+                    File file=resources.get(i).getPath().toFile();
+                    String baseName=Utils.getBaseName(file);                 
+                    if (baseName != null) {
+                        if(baseName.equals(key)) //checking the language of each locale to add the searched resource to the list
+                        {
+                            flag = true;
+                            Path dirLanguage = resources.get(i).getPath();
                             Path pathProject = project.getPath();
-                            importProject(pathProject, testPath);
+                            importProject(pathProject, dirLanguage);
 
 //                            if (testPath != null) {
 //                                Resource resource = resources.get(i);
@@ -176,7 +194,7 @@ public class Editor extends JFrame {
 //                            }
                         }
                     }
-                }
+                }*/
                 editorMenu.setEnableClearSearch(true);
                 if (!flag) {
                     Dialogs.showWarningDialog(this, MessageBundle.get("dialogs.translation.language.find.title"), MessageBundle.get("dialogs.translation.language.find.error"));
@@ -188,7 +206,7 @@ public class Editor extends JFrame {
     }
 
 
-    public void importProject(Path dir, Path dirLanguage) {
+    public void importProject(Path dir, List<Path> dirLanguage) {
         if (!dir.toFile().exists()) {
             Utils.showError(MessageBundle.get("dialogs.dir.notexist"));
         }

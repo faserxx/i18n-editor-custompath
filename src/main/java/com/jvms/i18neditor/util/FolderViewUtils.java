@@ -24,7 +24,7 @@ public class FolderViewUtils {
         throw new IllegalStateException("Utility class");
     }
     private static final Logger log = LoggerFactory.getLogger(FolderViewUtils.class);
-    public static  Pair<Boolean, TranslationTreeNode> analizeAndCreateTree(Editor editor, EditorProject project, Path dir, Path dirLanguage, TranslationTree translationTree, EditorSettings settings){
+    public static  Pair<Boolean, TranslationTreeNode> analizeAndCreateTree(Editor editor, EditorProject project, Path dir, List<Path> dirLanguage, TranslationTree translationTree, EditorSettings settings){
         //Create the Nodes with the folder structure
         Pair<Boolean, TranslationTreeNode> createDir = createTreeByDir(project, editor, dir.toFile(), dirLanguage);
 
@@ -45,7 +45,7 @@ public class FolderViewUtils {
         return createDir;
     }
 
-    private static Pair<Boolean, TranslationTreeNode> analizeJson(EditorProject project, Editor editor, File dir, Path dirLenguage) throws JsonSyntaxException {
+    private static Pair<Boolean, TranslationTreeNode> analizeJson(EditorProject project, Editor editor, File dir, List<Path> dirLanguage) throws JsonSyntaxException {
         final boolean[] showErrorJson = {false};
 
         Optional<ResourceType> type = Optional.ofNullable(project.getResourceType());
@@ -60,7 +60,11 @@ public class FolderViewUtils {
 
 
         resourceList.forEach(resource -> {
-                    if (dirLenguage == null || resource.getPath().toString().equals(dirLenguage.toString())) {
+            if(dirLanguage!=null)
+            {    
+             for(int i=0;i<dirLanguage.size();i++)
+                {
+                    if (dirLanguage.get(i) == null || resource.getPath().toString().equals(dirLanguage.get(i).toString())) {
                         try {
 
                             if (Resources.load(resource)) {
@@ -75,7 +79,27 @@ public class FolderViewUtils {
                             Utils.showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
                         }
                     }
-                }
+                } 
+            }
+            else
+            {
+               if (dirLanguage == null) {
+                        try {
+
+                            if (Resources.load(resource)) {
+                                showErrorJson[0] = true;
+                            }
+
+                            editor.setupResource(resource);
+                            project.addResource(resource);
+
+                        } catch (IOException e) {
+                            log.error("Error importing resource file " + resource.getPath(), e);
+                            Utils.showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
+                        }
+                    } 
+            }
+        }
 
         );
 
@@ -91,7 +115,7 @@ public class FolderViewUtils {
 
 
 
-    public static Pair<Boolean, TranslationTreeNode> createTreeByDir(EditorProject project, Editor editor, File node, Path dirLanguage) {
+    public static Pair<Boolean, TranslationTreeNode> createTreeByDir(EditorProject project, Editor editor, File node, List<Path> dirLanguage) {
 
         //This boolean is to show if there is any json that does not comply with the structure
         boolean showErrorJsonMalformed = false;
