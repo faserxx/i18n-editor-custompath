@@ -25,6 +25,7 @@ public class EditorProjectSettingsPane extends AbstractSettingsPane {
         this.setupUI();
     }
 
+
     private void setupUI() {
         EditorProject project = editor.getProject();
 
@@ -44,26 +45,13 @@ public class EditorProjectSettingsPane extends AbstractSettingsPane {
         fileStructureField.setSelectedItem(currentFileStructureItem);
         fileStructureField.addActionListener(e -> {
             project.setResourceFileStructure(((ComboBoxFileStructure) fileStructureField.getSelectedItem()).getStructure());
+
         });
         fileStructurePanel.add(fileStructureLabel);
         fileStructurePanel.add(fileStructureField);
         fieldset1.add(fileStructurePanel, createVerticalGridBagConstraints());
 
-        JPanel resourceDefinitionPanel = new JPanel(new GridLayout(0, 1));
-        JLabel resourceDefinitionLabel = new JLabel(MessageBundle.get("settings.resourcedef.title"));
-        JHelpLabel resourceDefinitionHelpLabel = new JHelpLabel(MessageBundle.get("settings.resourcedef.help"));
-        JTextField resourceDefinitionField = new JTextField(project.getResourceFileDefinition());
-        resourceDefinitionField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String value = resourceDefinitionField.getText().trim();
-                project.setResourceFileDefinition(value.isEmpty() ? EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION : value);
-            }
-        });
-        resourceDefinitionPanel.add(resourceDefinitionLabel);
-        resourceDefinitionPanel.add(resourceDefinitionField);
-        fieldset1.add(resourceDefinitionPanel, createVerticalGridBagConstraints());
-        fieldset1.add(resourceDefinitionHelpLabel, createVerticalGridBagConstraints());
+
 
         ResourceType type = project.getResourceType();
         if (type == ResourceType.JSON || type == ResourceType.ES6) {

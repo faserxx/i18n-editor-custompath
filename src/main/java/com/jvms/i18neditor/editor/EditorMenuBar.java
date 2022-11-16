@@ -1,5 +1,6 @@
 package com.jvms.i18neditor.editor;
 
+import com.jvms.i18neditor.FileStructure;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.editor.menu.*;
 import com.jvms.i18neditor.swing.util.Dialogs;
@@ -15,6 +16,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import static javax.swing.JOptionPane.DEFAULT_OPTION;
 
 /**
  * This class represents the top bar menu of the editor.
@@ -207,10 +210,19 @@ public class EditorMenuBar extends JMenuBar {
         });
 
         projectSettingsMenuItem = new JMenuItem(MessageBundle.get("menu.settings.preferences.project.title"));
+
+
         projectSettingsMenuItem.addActionListener(e -> {
-            Dialogs.showComponentDialog(editor,
+           /* Dialogs.showComponentDialog(editor,
                     MessageBundle.get("dialogs.preferences.project.title"),
-                    new EditorProjectSettingsPane(editor));
+                    new EditorProjectSettingsPane(editor));*/
+            FileStructure before = editor.getProject().getResourceFileStructure();
+            int result = JOptionPane.showOptionDialog(editor,  new EditorProjectSettingsPane(editor), MessageBundle.get("dialogs.preferences.project.title"), DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, null, null);
+            if(result == 0 && editor.getProject().getResourceFileStructure() != before){
+                editor.saveProject();
+                editor.importProject(editor.getProject().getPath(),null);
+            }
         });
 
         settingsMenu.add(editorSettingsMenuItem);

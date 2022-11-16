@@ -9,9 +9,11 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,11 +64,29 @@ public class FlatViewUtils {
         return createDir;
     }
 
+    public static Path  getPathofLocale(EditorProject project, Editor editor){
+        Path path = null;
+
+            JFileChooser fc = new JFileChooser(project.getPath().toString());
+            fc.setDialogTitle(MessageBundle.get("dialogs.project.import.title"));
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int result = fc.showOpenDialog(editor);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                path = Paths.get(fc.getSelectedFile().getPath());
+                if (path.toFile().getName().equals("i18n")) {
+                    path = path.getParent();
+                }
+            }
+
+
+
+        return path;
+
+    }
     public static Pair<Boolean, TranslationTreeNode> createTreeByDir(Editor editor, EditorProject project, File dir, Path dirLanguage) {
         final boolean[] showErrorJson = {false};
 
-        ResourceType type = ResourceType.JSON;
-        List<Resource> resourceList = null;
+
 
         Map<String, String> keys = Maps.newTreeMap();
 

@@ -178,7 +178,7 @@ public class Editor extends JFrame {
                     }
                 }
                 editorMenu.setEnableClearSearch(true);
-                if (!flag) {
+                if (Boolean.FALSE.equals(flag)) {
                     Dialogs.showWarningDialog(this, MessageBundle.get("dialogs.translation.language.find.title"), MessageBundle.get("dialogs.translation.language.find.error"));
                 }
                 key = null;
@@ -460,13 +460,21 @@ public class Editor extends JFrame {
 
             if (!Utils.isLocaleAvailable(localeString)) {
                 Utils.showError(MessageBundle.get("dialogs.locale.add.error.invalid"));
+
             } else {
+
                 TranslationTreeNode node = translationTree.getSelectionNode();
-                Path path = Utils.getPathOfNode(node, project);
-                if (node.isRoot()) {
-                    path = project.getPath();
+                Path path = project.getPath();
+
+                if (project.getResourceFileStructure() == FileStructure.Flat) {
+                    path = FlatViewUtils.getPathofLocale(project, this);
+
+                } else if (!node.isRoot()) {
+                    path = Utils.getPathOfNode(node, project);
 
                 }
+
+
                 addLocale(path, localeString);
 
                 localeString = null;
@@ -793,10 +801,10 @@ public class Editor extends JFrame {
         introText = new JLabel("<html><body style=\"text-align:center; padding:30px;\">" + MessageBundle.get("core.intro.text") + "</body></html>");
         introText.setOpaque(true);
         introText.setFont(introText.getFont().deriveFont(28f));
-        introText.setHorizontalTextPosition(JLabel.CENTER);
-        introText.setVerticalTextPosition(JLabel.BOTTOM);
-        introText.setHorizontalAlignment(JLabel.CENTER);
-        introText.setVerticalAlignment(JLabel.CENTER);
+        introText.setHorizontalTextPosition(SwingConstants.CENTER);
+        introText.setVerticalTextPosition(SwingConstants.BOTTOM);
+        introText.setHorizontalAlignment(SwingConstants.CENTER);
+        introText.setVerticalAlignment(SwingConstants.CENTER);
         introText.setForeground(getBackground().darker());
         introText.setIcon(Images.loadFromClasspath("images/icon-intro.png"));
 
@@ -1033,7 +1041,7 @@ public class Editor extends JFrame {
         settings.setHistory(props.getListProperty("history"));
         settings.setLastExpandedNodes(props.getListProperty("last_expanded"));
         settings.setLastSelectedNode(props.getProperty("last_selected"));
-         settings.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, FileStructure.Flat));
+        settings.setResourceFileStructure(props.getEnumProperty("resource_structure", FileStructure.class, FileStructure.Flat));
         settings.setEditorLanguage(props.getLocaleProperty("editor_language"));
         settings.setCloseInError(props.getBooleanProperty("close_in_error", false));
     }

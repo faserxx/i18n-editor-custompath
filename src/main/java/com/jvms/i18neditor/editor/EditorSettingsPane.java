@@ -7,9 +7,12 @@ import org.apache.commons.lang3.LocaleUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * This class represents the editor settings pane.
@@ -75,27 +78,14 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         JComboBox fileStructureField = new JComboBox(fileStructureComboBoxItems.toArray());
         fileStructureField.setSelectedItem(currentFileStructureItem);
         fileStructureField.addActionListener(e -> {
-            settings.setResourceFileStructure(((ComboBoxFileStructure) fileStructureField.getSelectedItem()).getStructure());
+                        settings.setResourceFileStructure(((ComboBoxFileStructure) Objects.requireNonNull(fileStructureField.getSelectedItem())).getStructure());
+
         });
         fileStructurePanel.add(fileStructureLabel);
         fileStructurePanel.add(fileStructureField);
         fieldset2.add(fileStructurePanel, createVerticalGridBagConstraints());
 
-        JPanel resourceDefinitionPanel = new JPanel(new GridLayout(0, 1));
-        JLabel resourceDefinitionLabel = new JLabel(MessageBundle.get("settings.resourcedef.title"));
-        JHelpLabel resourceDefinitionHelpLabel = new JHelpLabel(MessageBundle.get("settings.resourcedef.help"));
-        JTextField resourceDefinitionField = new JTextField(settings.getResourceFileDefinition());
-        resourceDefinitionField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String value = resourceDefinitionField.getText().trim();
-                settings.setResourceFileDefinition(value.isEmpty() ? EditorSettings.DEFAULT_RESOURCE_FILE_DEFINITION : value);
-            }
-        });
-        resourceDefinitionPanel.add(resourceDefinitionLabel);
-        resourceDefinitionPanel.add(resourceDefinitionField);
-        fieldset2.add(resourceDefinitionPanel, createVerticalGridBagConstraints());
-        fieldset2.add(resourceDefinitionHelpLabel, createVerticalGridBagConstraints());
+
 
         JCheckBox minifyBox = new JCheckBox(MessageBundle.get("settings.minify.title") + " " +
                 MessageBundle.get("settings.resource.jsones6"));
@@ -108,6 +98,9 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         flattenJSONBox.setSelected(settings.isFlattenJSON());
         flattenJSONBox.addChangeListener(e -> settings.setFlattenJSON(flattenJSONBox.isSelected()));
         fieldset2.add(flattenJSONBox, createVerticalGridBagConstraints());
+
+
+
 
         // Editing settings
         JPanel fieldset3 = createFieldset(MessageBundle.get("settings.fieldset.editing"));
@@ -145,4 +138,11 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         add(fieldset2, createVerticalGridBagConstraints());
         add(fieldset3, createVerticalGridBagConstraints());
     }
+
+    ActionListener actionListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println(e);
+        }
+    };
 }
