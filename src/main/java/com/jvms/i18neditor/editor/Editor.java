@@ -59,7 +59,6 @@ public class Editor extends JFrame {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private EditorProject project;
     private boolean dirty;
-
     private EditorMenuBar editorMenu;
     private JSplitPane contentPane;
     private JLabel introText;
@@ -70,6 +69,7 @@ public class Editor extends JFrame {
     private JPanel resourcesPanel;
     private Set<ResourceField> resourceFields = new HashSet<>();
     private Map<ResourceField, JLabel> jLabels = new HashMap<>();
+    private Path pathOfTranslate;
 
 
 //    public void createProject(Path dir, ResourceType type) {
@@ -324,7 +324,8 @@ public class Editor extends JFrame {
             return false;
         }
         if (project != null) {
-            String path = Utils.getPathOfNode(translationTree.getSelectionNode(), project).toString();
+            //String path = Utils.getPathOfNode(translationTree.getSelectionNode(), project).toString();
+            String path = pathOfTranslate.toString();//FlatViewUtils.getPathofTranslate(project, this).toString();
             project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.storeTranslation(key, ""));
         }
         translationTree.addNodeByKey(key);
@@ -495,16 +496,17 @@ public class Editor extends JFrame {
 
 
     public void showAddTranslationDialog(TranslationTreeNode node) {
-        if (node.typeFile == TypeFile.FOLDER) {
+        if(project.getResourceFileStructure() == FileStructure.Flat){
+            pathOfTranslate = FlatViewUtils.getPathofTranslate(project, this);
+        }
+        else if (node.typeFile == TypeFile.FOLDER) {
             Path path = Utils.getPathOfNode(node, project);
             if (node.isRoot()) {
                 path = project.getPath();
-
             }
             if (path.toFile().listFiles().length == 0) {
                 showAddLocaleDialog();
             }
-
         }
         String key = "";
         String newKey = "";

@@ -5,13 +5,17 @@ import com.google.common.collect.Maps;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.editor.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +102,35 @@ public class FlatViewUtils {
         return Pair.create(showErrorJson[0], new TranslationTreeNode(MessageBundle.get("tree.root.name"), Lists.newArrayList(keys.keySet()), TypeFile.FOLDER));
 
 
+    }
+
+    public static Path  getPathofTranslate(EditorProject project, Editor editor){
+        Path path = null;
+        String aaPathProject = project.getPath().toString();
+        JFileChooser fc = new JFileChooser(project.getPath().toString());
+        fc.setDialogTitle(MessageBundle.get("dialogs.create.translate"));
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = fc.showOpenDialog(editor);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String aaPathFileChooser = fc.getSelectedFile().toPath().toString();
+            path = Paths.get(fc.getSelectedFile().getPath());
+            if(path.toString().contains(aaPathProject)){
+                try {
+                    if (path.toFile().getName().equals("i18n")) {
+                        path = path.getParent();
+                    }
+                    else if(!FileUtils.directoryContains(new File(path.toString()),new File(Paths.get(path.toString()+"\\i18n").toString()))){
+                        Files.createDirectory(Paths.get(path.toString()+"\\i18n"));
+                    }
+                } catch (IOException e) {
+                    log.error("Error creating directory", e);
+                    Utils.showError(MessageBundle.get("resources.create.folder.error"));
+                }
+            }else{
+                Utils.showError(MessageBundle.get("resources.project.path.error"));
+            }
+        }
+        return path;
     }
 
 }
