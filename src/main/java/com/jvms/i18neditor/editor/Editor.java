@@ -496,12 +496,12 @@ public class Editor extends JFrame {
         if (project.getResourceFileStructure() == FileStructure.Flat) {
             pathOfTranslate = FlatViewUtils.getPathofTranslate(project, this);
         } else if (node.getTypeFile() == TypeFile.FOLDER) {
-            Path path = Utils.getPathOfNode(node, project);
+            pathOfTranslate = Utils.getPathOfNode(node, project);
             if (node.isRoot()) {
-                path = project.getPath();
+                pathOfTranslate = project.getPath();
 
             }
-            if (path.toFile().listFiles().length == 0) {
+            if (pathOfTranslate.toFile().listFiles().length == 0) {
                 showAddLocaleDialog();
             }
 
