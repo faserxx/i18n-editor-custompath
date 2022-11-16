@@ -241,7 +241,7 @@ public class Editor extends JFrame {
     }
 
     public void removeSelectedTranslation() {
-        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.translation.remove.title"), MessageBundle.get("dialogs.translation.remove.title"), JOptionPane.YES_NO_CANCEL_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.translation.remove.texto"), MessageBundle.get("dialogs.translation.remove.title"), JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {        
             TranslationTreeNode node = translationTree.getSelectionNode();
             if (node != null && !node.isRoot()) {
