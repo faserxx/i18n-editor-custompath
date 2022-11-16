@@ -232,7 +232,7 @@ public class Resource {
      * @return whether parent values are supported.
      */
     public boolean supportsParentValues() {
-        return type == ResourceType.Properties;
+        return type == ResourceType.PROPERTIES;
     }
 
     /**

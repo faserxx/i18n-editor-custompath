@@ -8,7 +8,7 @@ import com.jvms.i18neditor.swing.JTextField;
  * @author Jacob van Mourik
  */
 public class TranslationKeyField extends JTextField {
-    private final static long serialVersionUID = -3951187528785224704L;
+    private static final long serialVersionUID = -3951187528785224704L;
 
     public TranslationKeyField() {
         super();

@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.editor.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -24,7 +26,7 @@ public class FlatViewUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    private static final Logger log = LoggerFactory.getLogger(FolderViewUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(FlatViewUtils.class);
 
     public static List<Resource> showFiles(File[] files) {
         List<Resource> result = Lists.newLinkedList();
@@ -43,7 +45,7 @@ public class FlatViewUtils {
         }
         return result;
     }
-    public static  Pair<Boolean, TranslationTreeNode> analizeAndCreateTree(Editor editor, EditorProject project, Path dir, Path dirLanguage, TranslationTree translationTree, EditorSettings settings){
+    public static  Pair<Boolean, TranslationTreeNode> analizeAndCreateTree(Editor editor, EditorProject project, Path dir, List<Path> dirLanguage, TranslationTree translationTree, EditorSettings settings){
         //Create the Nodes with the folder structure
         Pair<Boolean, TranslationTreeNode> createDir = createTreeByDir( editor,project,  dir.toFile(),  dirLanguage);
 
@@ -83,7 +85,7 @@ public class FlatViewUtils {
         return path;
 
     }
-    public static Pair<Boolean, TranslationTreeNode> createTreeByDir(Editor editor, EditorProject project, File dir, Path dirLanguage) {
+    public static Pair<Boolean, TranslationTreeNode> createTreeByDir(Editor editor, EditorProject project, File dir, List<Path> dirLanguage) {
         final boolean[] showErrorJson = {false};
 
 
@@ -92,19 +94,43 @@ public class FlatViewUtils {
 
 
         showFiles(dir.listFiles()).forEach(resource -> {
-                    if (dirLanguage == null || resource.getPath().toString().equals(dirLanguage.toString())) {
-                        try {
+                    if(dirLanguage!=null)
+                    {
+                        for(int i=0;i<dirLanguage.size();i++)
+                        {
+                            if (dirLanguage.get(i) == null || resource.getPath().toString().equals(dirLanguage.get(i).toString())) {
+                                try {
 
-                            if (Resources.load(resource)) {
-                                showErrorJson[0] = true;
+                                    if (Resources.load(resource)) {
+                                        showErrorJson[0] = true;
+                                    }
+
+                                    editor.setupResource(resource);
+                                    project.addResource(resource);
+
+                                } catch (IOException e) {
+                                    log.error("Error importing resource file " + resource.getPath(), e);
+                                    Utils.showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
+                                }
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (dirLanguage == null) {
+                            try {
 
-                            editor.setupResource(resource);
-                            project.addResource(resource);
+                                if (Resources.load(resource)) {
+                                    showErrorJson[0] = true;
+                                }
 
-                        } catch (IOException e) {
-                            log.error("Error importing resource file " + resource.getPath(), e);
-                            Utils.showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
+                                editor.setupResource(resource);
+                                project.addResource(resource);
+
+                            } catch (IOException e) {
+                                log.error("Error importing resource file " + resource.getPath(), e);
+                                Utils.showError(MessageBundle.get("resources.import.error.single", resource.getPath()));
+                            }
                         }
                     }
                 }
@@ -118,6 +144,35 @@ public class FlatViewUtils {
         return Pair.create(showErrorJson[0], new TranslationTreeNode(MessageBundle.get("tree.root.name"), Lists.newArrayList(keys.keySet()), TypeFile.FOLDER));
 
 
+    }
+
+    public static Path  getPathofTranslate(EditorProject project, Editor editor){
+        Path path = null;
+        String aaPathProject = project.getPath().toString();
+        JFileChooser fc = new JFileChooser(project.getPath().toString());
+        fc.setDialogTitle(MessageBundle.get("dialogs.create.translate"));
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = fc.showOpenDialog(editor);
+        if (result == JFileChooser.APPROVE_OPTION) {
+
+            path = Paths.get(fc.getSelectedFile().getPath());
+            if(path.toString().contains(aaPathProject)){
+                try {
+                    if (path.toFile().getName().equals("i18n")) {
+                        path = path.getParent();
+                    }
+                    else if(!FileUtils.directoryContains(new File(path.toString()),new File(Paths.get(path.toString()+"\\i18n").toString()))){
+                        Files.createDirectory(Paths.get(path.toString()+"\\i18n"));
+                    }
+                } catch (IOException e) {
+                    log.error("Error creating directory", e);
+                    Utils.showError(MessageBundle.get("resources.create.folder.error"));
+                }
+            }else{
+                Utils.showError(MessageBundle.get("resources.project.path.error"));
+            }
+        }
+        return path;
     }
 
 }

@@ -9,7 +9,7 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class JScrollablePanel extends JPanel implements Scrollable {
-    private final static long serialVersionUID = -7947570506111556197L;
+    private static final long serialVersionUID = -7947570506111556197L;
     private final boolean scrollableTracksViewportWidth;
     private final boolean scrollableTracksViewportHeight;
 

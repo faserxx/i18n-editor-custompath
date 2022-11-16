@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class RemoveTranslationMenuItem extends JMenuItem {
-    private final static long serialVersionUID = 5207946396515235714L;
+    private static final long serialVersionUID = 5207946396515235714L;
 
     public RemoveTranslationMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.edit.delete.title"));

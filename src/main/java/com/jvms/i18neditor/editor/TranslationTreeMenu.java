@@ -13,7 +13,7 @@ import javax.swing.*;
  * @author Jacob van Mourik
  */
 public class TranslationTreeMenu extends JPopupMenu {
-    private final static long serialVersionUID = -8450484152294368841L;
+    private static final long serialVersionUID = -8450484152294368841L;
 
     public TranslationTreeMenu(Editor editor, TranslationTree tree) {
         super();

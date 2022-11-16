@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class FindTranslationMenuItem extends JMenuItem {
-    private final static long serialVersionUID = -1298283182450978961L;
+    private static final long serialVersionUID = -1298283182450978961L;
 
     public FindTranslationMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.edit.find.translation.title"));

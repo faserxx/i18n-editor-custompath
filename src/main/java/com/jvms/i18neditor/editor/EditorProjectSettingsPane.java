@@ -1,14 +1,12 @@
 package com.jvms.i18neditor.editor;
 
 import com.jvms.i18neditor.ResourceType;
-import com.jvms.i18neditor.swing.JHelpLabel;
-import com.jvms.i18neditor.swing.JTextField;
+
 import com.jvms.i18neditor.util.MessageBundle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+
 
 /**
  * This class represents the project settings pane.
@@ -16,7 +14,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class EditorProjectSettingsPane extends AbstractSettingsPane {
-    private final static long serialVersionUID = 5665963334924596315L;
+    private static final long serialVersionUID = 5665963334924596315L;
     private final Editor editor;
 
     public EditorProjectSettingsPane(Editor editor) {
@@ -43,10 +41,10 @@ public class EditorProjectSettingsPane extends AbstractSettingsPane {
         JLabel fileStructureLabel = new JLabel(MessageBundle.get("settings.filestructure.title"));
         JComboBox fileStructureField = new JComboBox(fileStructureComboBoxItems.toArray());
         fileStructureField.setSelectedItem(currentFileStructureItem);
-        fileStructureField.addActionListener(e -> {
-            project.setResourceFileStructure(((ComboBoxFileStructure) fileStructureField.getSelectedItem()).getStructure());
+        fileStructureField.addActionListener(e ->
+            project.setResourceFileStructure(((ComboBoxFileStructure) fileStructureField.getSelectedItem()).getStructure())
 
-        });
+        );
         fileStructurePanel.add(fileStructureLabel);
         fileStructurePanel.add(fileStructureField);
         fieldset1.add(fileStructurePanel, createVerticalGridBagConstraints());

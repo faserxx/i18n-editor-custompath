@@ -10,7 +10,7 @@ import javax.swing.*;
  * @author Jacob van Mourik
  */
 public class ResourcesPaneMenu extends JPopupMenu {
-    private final static long serialVersionUID = 2259323824622576156L;
+    private static final long serialVersionUID = 2259323824622576156L;
 
     public ResourcesPaneMenu(Editor editor) {
         super();

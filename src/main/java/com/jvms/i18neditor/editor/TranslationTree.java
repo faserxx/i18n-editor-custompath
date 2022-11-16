@@ -21,7 +21,7 @@ import java.util.Set;
  * @author Jacob van Mourik
  */
 public class TranslationTree extends JTree {
-    private final static long serialVersionUID = -2888673305196385241L;
+    private static final long serialVersionUID = -2888673305196385241L;
 
     public TranslationTree() {
         super(new TranslationTreeModel());

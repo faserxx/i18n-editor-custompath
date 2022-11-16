@@ -9,11 +9,11 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class TranslationTreeStatusIcon implements Icon {
-    private final static int SIZE = 7;
+    private static final int SIZE = 7;
     private final StatusIconType type;
 
     public enum StatusIconType {
-        Warning(new Color(220, 160, 0));
+        WARNING(new Color(220, 160, 0));
 
         private final Color color;
 
@@ -21,7 +21,7 @@ public class TranslationTreeStatusIcon implements Icon {
             return color;
         }
 
-        private StatusIconType(Color color) {
+        StatusIconType(Color color) {
             this.color = color;
         }
     }
@@ -48,6 +48,6 @@ public class TranslationTreeStatusIcon implements Icon {
 
     @Override
     public int getIconHeight() {
-        return SIZE;
+       return getIconWidth();
     }
 }

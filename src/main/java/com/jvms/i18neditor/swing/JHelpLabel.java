@@ -10,7 +10,7 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class JHelpLabel extends JLabel {
-    private final static long serialVersionUID = -6879887592161450052L;
+    private static final long serialVersionUID = -6879887592161450052L;
 
     /**
      * Constructs a {@link JHelpLabel}.

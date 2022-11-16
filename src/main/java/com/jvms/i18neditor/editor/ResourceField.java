@@ -15,7 +15,7 @@ import java.util.Locale;
  * @author Jacob van Mourik
  */
 public class ResourceField extends JTextArea implements Comparable<ResourceField> {
-    private final static long serialVersionUID = 2034814490878477055L;
+    private static final long serialVersionUID = 2034814490878477055L;
     private final Resource resource;
 
     public ResourceField(Resource resource) {

@@ -7,13 +7,11 @@ import com.google.gson.Gson;
 import com.jvms.i18neditor.FileStructure;
 import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.editor.EditorProject;
-import com.jvms.i18neditor.editor.ResourceField;
 import com.jvms.i18neditor.editor.TranslationTreeNode;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.LocaleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import javax.swing.tree.TreeNode;
 import java.io.File;
@@ -25,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
-    private static final Logger log = LoggerFactory.getLogger(Utils.class);
+
 
     private Utils() {
         throw new IllegalStateException("Utility class");
@@ -84,7 +82,7 @@ public class Utils {
     }
 
     public static Path getPathOfNode(TranslationTreeNode node, EditorProject project) {
-        if (node.typeFile == TypeFile.FOLDER) {
+        if (node.getTypeFile() == TypeFile.FOLDER) {
             String key = node.getKey();
 
             return findDirectoryWithSameName(key, project.getPath().toFile());
@@ -107,21 +105,7 @@ public class Utils {
     }
 
 
-//    public static Path retunPathByTypeofNode(TranslationTreeNode node, EditorProject project, TranslationTree translationTree) {
-//
-//        //if is null then is root
-//        if (node == null) {
-//            return project.getPath();
-//        }
-//
-//
-//
-//        Path path = Paths.get(Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey())).get(0));
-//
-//        return path.getParent();
-//
-//
-//    }
+
 
     public static List<String> getAllPathFromKeys(EditorProject project, String nameKey) {
 
@@ -133,14 +117,7 @@ public class Utils {
 
     }
 
-    public static List<String> getAllPathFromKeysAlls(EditorProject project, String nameKey) {
 
-        //Iterate over all resources and find the respective key
-        return project.getResources().stream()
-                .map(x -> x.getPath().toAbsolutePath().toString())
-                .collect(Collectors.toList());
-
-    }
 
 
     public static String restoreStringTrunk(TranslationTreeNode node, String key) {
@@ -194,20 +171,7 @@ public class Utils {
 
     }
 
-//    public static String construcPathByNodes(String name, String path, TranslationTree translationTree) {
-//
-//        //Obtain the last element that is a leaf
-//        String parentKey = name.replaceAll("." + Files.getFileExtension(name), "");
-//        //replace to key to obtain the father
-//        parentKey = getNameTrunk(translationTree.getNodeByKey(parentKey));
-//        //Convert String to path
-//        final Path[] objec = {Paths.get(path)};
-//        //Replace every . in the key to create the path
-//        Arrays.stream(parentKey.split("\\.")).forEach(x -> objec[0] = objec[0].resolve(x));
-//        return objec[0].resolve("i18n").toString();
-//
-//
-//    }
+
 
 
     public static String getNameTrunk(TreeNode node) {
@@ -217,7 +181,7 @@ public class Utils {
 
         if (node.getParent() != null) {
             TranslationTreeNode nodeParent = (TranslationTreeNode) node.getParent();
-            if (nodeParent.typeFile == TypeFile.FOLDER) {
+            if (nodeParent.getTypeFile() == TypeFile.FOLDER) {
                 sb.append(((TranslationTreeNode) node.getParent()).getKey());
 
             } else {

@@ -14,7 +14,7 @@ import java.util.List;
  * @author Jacob van Mourik
  */
 public class TranslationTreeModel extends DefaultTreeModel {
-    private final static long serialVersionUID = 3261808274177599488L;
+    private static final long serialVersionUID = 3261808274177599488L;
 
     public TranslationTreeModel() {
         super(new TranslationTreeNode(MessageBundle.get("tree.root.name"), Lists.newArrayList()));

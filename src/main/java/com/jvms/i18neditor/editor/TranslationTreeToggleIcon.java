@@ -11,11 +11,11 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class TranslationTreeToggleIcon implements Icon {
-    private final static int SIZE = 10;
+    private static final int SIZE = 10;
     private final ToggleIconType type;
 
     public enum ToggleIconType {
-        Collapsed, Expanded
+        COLLAPSED, EXPANDED
     }
 
     public TranslationTreeToggleIcon(ToggleIconType type) {
@@ -30,7 +30,7 @@ public class TranslationTreeToggleIcon implements Icon {
         g.drawRect(x, y, SIZE, SIZE);
         g.setColor(UIManager.getColor("Tree.foreground"));
         g.drawLine(x + 2, y + SIZE / 2, x + SIZE - 2, y + SIZE / 2);
-        if (type == ToggleIconType.Collapsed) {
+        if (type == ToggleIconType.COLLAPSED) {
             g.drawLine(x + SIZE / 2, y + 2, x + SIZE / 2, y + SIZE - 2);
         }
     }
@@ -42,6 +42,6 @@ public class TranslationTreeToggleIcon implements Icon {
 
     @Override
     public int getIconHeight() {
-        return SIZE;
+       return getIconWidth();
     }
 }

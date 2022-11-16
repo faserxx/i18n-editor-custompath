@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class JTextArea extends javax.swing.JTextArea {
-    private final static long serialVersionUID = -5043046809426384893L;
+    private static final long serialVersionUID = -5043046809426384893L;
     protected final UndoManager undoManager = new UndoManager();
 
     /**

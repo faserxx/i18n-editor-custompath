@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  * @author Jacob van Mourik
  */
 public class RedoAction extends AbstractAction {
-    private final static long serialVersionUID = -3051499148079684354L;
+    private static final long serialVersionUID = -3051499148079684354L;
     private final UndoManager undoManager;
 
     public RedoAction(UndoManager undoManager) {

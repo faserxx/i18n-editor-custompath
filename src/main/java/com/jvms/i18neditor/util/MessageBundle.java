@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
  * @author Jacob van Mourik
  */
 public final class MessageBundle {
-    private final static String RESOURCES_PATH = "bundles/messages";
-    private static ResourceBundle RESOURCES;
+    private static final String RESOURCES_PATH = "bundles/messages";
+    private static ResourceBundle resources;
 
     /**
      * Sets the preferred locale to use.
@@ -23,7 +23,7 @@ public final class MessageBundle {
      * @param locale the preferred locale to use
      */
     public static void setLocale(Locale locale) {
-        RESOURCES = ResourceBundle.getBundle(RESOURCES_PATH, locale);
+        resources = ResourceBundle.getBundle(RESOURCES_PATH, locale);
     }
 
     /**
@@ -35,7 +35,7 @@ public final class MessageBundle {
      * @return the formatted value for the given key.
      */
     public static String get(String key, Object... args) {
-        String value = RESOURCES.getString(key);
+        String value = resources.getString(key);
         return MessageFormat.format(value, args);
     }
 
@@ -46,7 +46,7 @@ public final class MessageBundle {
      * @return the mnemonic value for the given key.
      */
     public static Character getMnemonic(String key) {
-        String value = RESOURCES.getString(key);
+        String value = resources.getString(key);
         return value.charAt(0);
     }
 
@@ -54,6 +54,6 @@ public final class MessageBundle {
      * Loads the resources.
      */
     public static void loadResources() {
-        RESOURCES = ResourceBundle.getBundle(RESOURCES_PATH);
+        resources = ResourceBundle.getBundle(RESOURCES_PATH);
     }
 }

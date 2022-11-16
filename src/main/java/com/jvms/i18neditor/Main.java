@@ -13,7 +13,7 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class Main {
-    private final static Logger log = LoggerFactory.getLogger(Main.class);
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

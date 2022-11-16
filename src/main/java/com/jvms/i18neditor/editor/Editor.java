@@ -70,6 +70,7 @@ public class Editor extends JFrame {
     private JPanel resourcesPanel;
     private Set<ResourceField> resourceFields = new HashSet<>();
     private Map<ResourceField, JLabel> jLabels = new HashMap<>();
+    private Path pathOfTranslate;
 
 
 //    public void createProject(Path dir, ResourceType type) {
@@ -151,49 +152,43 @@ public class Editor extends JFrame {
                                    }
                         else
                                    {*/
-            if (!key.equals("")) {
+            if (key != null) {
                 List<Resource> resources = project.getResources();  //Getting resource list
                 Boolean flag = false;
+                List<Path> listPath = Lists.newArrayList();
                 for (int i = 0; i < resources.size(); i++) //looping through list of resources to select the one that belongs to the selected language
                 {
-                    Locale l = resources.get(i).getLocale(); //getting the Locale of each resource
-                    if (l != null) {
-                        if (l.getLanguage().contains(key)) //checking the language of each locale to add the searched resource to the list
-                        {
-                            flag = true;
-                            Path testPath = resources.get(i).getPath();
-                            Path pathProject = project.getPath();
-                            importProject(pathProject, testPath);
+                    File file = resources.get(i).getPath().toFile();
+                    String baseName = Utils.getBaseName(file);
+                    if (baseName != null &&
+                            baseName.equals(key)) //checking the language of each locale to add the searched resource to the list
+                    {
+                        flag = true;
+                        Path dirLanguage = resources.get(i).getPath();
+                        listPath.add(dirLanguage);
 
-//                            if (testPath != null) {
-//                                Resource resource = resources.get(i);
-//                                try {
-//                                    Resources.load(resource);
-//                                } catch (Exception e) {
-//                                }
-//                                setupResource(resources.get(i));
-//                                project.addResource(resources.get(i));
-//                            }
-                        }
                     }
                 }
+                Path pathProject = project.getPath();
+                importProject(pathProject, listPath);
+
+
                 editorMenu.setEnableClearSearch(true);
                 if (Boolean.FALSE.equals(flag)) {
                     Dialogs.showWarningDialog(this, MessageBundle.get("dialogs.translation.language.find.title"), MessageBundle.get("dialogs.translation.language.find.error"));
                 }
                 key = null;
             }
-            //break;
+
         }
     }
 
 
-    public void importProject(Path dir, Path dirLanguage) {
+    public void importProject(Path dir, List<Path> dirLanguage) {
         if (!dir.toFile().exists()) {
             Utils.showError(MessageBundle.get("dialogs.dir.notexist"));
         }
-        //Check if exist the directory
-        //Preconditions.checkArgument(Files.isDirectory(dir));
+
 
         if (!closeCurrentProject()) {
             return;
@@ -242,17 +237,20 @@ public class Editor extends JFrame {
     }
 
     public void removeSelectedTranslation() {
-        TranslationTreeNode node = translationTree.getSelectionNode();
-        if (node != null && !node.isRoot()) {
-            TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
+        int confirm = JOptionPane.showConfirmDialog(this, MessageBundle.get("dialogs.translation.remove.texto"), MessageBundle.get("dialogs.translation.remove.title"), JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            TranslationTreeNode node = translationTree.getSelectionNode();
+            if (node != null && !node.isRoot()) {
+                TranslationTreeNode parent = (TranslationTreeNode) node.getParent();
 
-            //Obtain all paths that containt the key
-            List<String> paths = Utils.getAllPathFromKeys(project, Utils.restoreStringTrunk(node, node.getKey()));
-            removeTranslation(node.getKey(), node);
-            Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
-            translationTree.setSelectionNode(parent);
+                String key = project.getResourceFileStructure() == FileStructure.Flat ? node.getKey() : Utils.restoreStringTrunk(node, node.getKey());
 
-
+                //Obtain all paths that containt the key
+                List<String> paths = Utils.getAllPathFromKeys(project, key);
+                removeTranslation(node.getKey(), node);
+                Utils.logsPathWithMessage(paths, 'D', MessageBundle.get("log.remove.selected.translation") + " " + node.getKey());
+                translationTree.setSelectionNode(parent);
+            }
         }
     }
 
@@ -317,18 +315,19 @@ public class Editor extends JFrame {
         TranslationTreeNode node = translationTree.getNodeByKey(key);
 
         if (node != null) {
-            //translationTree.setSelectionNode(node);
+
             JOptionPane.showMessageDialog(this, MessageBundle.get("dialogs.create.branch"), MessageBundle.get("dialogs.branch.title"), JOptionPane.YES_OPTION);
             return false;
         } else if (!confirmNewTranslation(key)) {
             return false;
         }
         if (project != null) {
-            String path = Utils.getPathOfNode(translationTree.getSelectionNode(), project).toString();
+
+            String path = pathOfTranslate.toString();
             project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.storeTranslation(key, ""));
         }
         translationTree.addNodeByKey(key);
-        //   Utils.writeLogsByNameKey(project, key, 'A', MessageBundle.get("log.add.translation") + key);
+
         requestFocusInFirstResourceField();
         return true;
     }
@@ -337,7 +336,9 @@ public class Editor extends JFrame {
         if (project != null) {
             String path = Utils.getPathOfNode(node, project).toString();
 
-            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(Utils.restoreStringTrunk(node, key)));
+            String keyName = project.getResourceFileStructure() == FileStructure.Flat ? key : Utils.restoreStringTrunk(node, node.getKey());
+
+            project.getResources().stream().filter(x -> x.getPath().toAbsolutePath().toString().contains(path)).forEach(resource -> resource.removeTranslation(keyName));
         }
         translationTree.removeNodeByKey(key);
         requestFocusInFirstResourceField();
@@ -424,18 +425,7 @@ public class Editor extends JFrame {
         editorMenu.setRecentItems(Lists.newArrayList());
     }
 
-//    public void showCreateProjectDialog(ResourceType type) {
-//        JFileChooser fc = new JFileChooser();
-//        fc.setDialogTitle(MessageBundle.get("dialogs.project.new.title"));
-//        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//        int result = fc.showOpenDialog(this);
-//        if (result == JFileChooser.APPROVE_OPTION) {
-//            createProject(Paths.get(fc.getSelectedFile().getPath()), type);
-//        } else {
-//            updateHistory();
-//            updateUI();
-//        }
-//    }
+
 
 
     public void showImportProjectDialog() {
@@ -503,7 +493,9 @@ public class Editor extends JFrame {
 
 
     public void showAddTranslationDialog(TranslationTreeNode node) {
-        if (node.typeFile == TypeFile.FOLDER) {
+        if (project.getResourceFileStructure() == FileStructure.Flat) {
+            pathOfTranslate = FlatViewUtils.getPathofTranslate(project, this);
+        } else if (node.getTypeFile() == TypeFile.FOLDER) {
             Path path = Utils.getPathOfNode(node, project);
             if (node.isRoot()) {
                 path = project.getPath();
@@ -641,7 +633,7 @@ public class Editor extends JFrame {
         if (project != null && project.hasResources()) {
             // Restore last expanded nodes
             List<String> expandedKeys = settings.getLastExpandedNodes();
-            List<TranslationTreeNode> expandedNodes = expandedKeys.stream().map(translationTree::getNodeByKey).filter(n -> n != null).collect(Collectors.toList());
+            List<TranslationTreeNode> expandedNodes = expandedKeys.stream().map(translationTree::getNodeByKey).filter(Objects::nonNull).collect(Collectors.toList());
             translationTree.expand(expandedNodes);
             // Restore last selected node
             String selectedKey = settings.getLastSelectedNode();
@@ -672,10 +664,10 @@ public class Editor extends JFrame {
             jLabel.setVisible(false);
             jLabels.put(field, jLabel);
             resourcesPanel.add(jLabel);
-            // resourcesPanel.add(Box.createVerticalStrut(5));
+
             resourcesPanel.add(field);
 
-            //resourcesPanel.add(Box.createVerticalStrut(10));
+
         });
 
         Container container = getContentPane();
@@ -724,9 +716,9 @@ public class Editor extends JFrame {
         while (!Strings.isNullOrEmpty(key)) {
             TranslationTreeNode node = translationTree.getNodeByKey(key);
             if (node != null && !node.isRoot() && node.isLeaf()) {
-                boolean hasValue = project.getResources().stream().anyMatch(r -> {
-                    return !Strings.isNullOrEmpty(r.getTranslation(node.getKey()));
-                });
+                boolean hasValue = project.getResources().stream().anyMatch(r ->
+                        !Strings.isNullOrEmpty(r.getTranslation(node.getKey()))
+                );
                 if (hasValue) {
                     return Dialogs.showConfirmDialog(this, MessageBundle.get("dialogs.translation.overwrite.title"), MessageBundle.get("dialogs.translation.overwrite.text", node.getKey()), JOptionPane.WARNING_MESSAGE);
                 }
@@ -816,16 +808,13 @@ public class Editor extends JFrame {
     }
 
     private void setupFileDrop() {
-        new JFileDrop(getContentPane(), null, new JFileDrop.Listener() {
-            @Override
-            public void filesDropped(java.io.File[] files) {
-                try {
-                    Path path = Paths.get(files[0].getCanonicalPath());
-                    importProject(path, null);
-                } catch (IOException e) {
-                    log.error("Error importing resources via file drop", e);
-                    showError(MessageBundle.get("resources.open.error.multiple"));
-                }
+        new JFileDrop(getContentPane(), null, files -> {
+            try {
+                Path path = Paths.get(files[0].getCanonicalPath());
+                importProject(path, null);
+            } catch (IOException e) {
+                log.error("Error importing resources via file drop", e);
+                showError(MessageBundle.get("resources.open.error.multiple"));
             }
         });
     }
@@ -981,7 +970,7 @@ public class Editor extends JFrame {
             } else {
                 // for backwards compatibility
                 project.setResourceFileDefinition(resourceName);
-                project.setResourceFileStructure(project.getResourceType() == ResourceType.Properties ? FileStructure.Flat : FileStructure.Nested);
+                project.setResourceFileStructure(project.getResourceType() == ResourceType.PROPERTIES ? FileStructure.Flat : FileStructure.Nested);
             }
         } else {
             project.setMinifyResources(settings.isMinifyResources());
@@ -1091,7 +1080,7 @@ public class Editor extends JFrame {
                 translationField.setValue(key);
                 resourceFields.forEach(x -> {
 
-                    if (node.typeFile != TypeFile.ELEMENT) {
+                    if (node.getTypeFile() != TypeFile.ELEMENT) {
                         resourcesPanel.setVisible(false);
                     } else if (x.getResource().getPath().getParent().getParent().toString().equals(Utils.getPathOfNode(node, project).toString())
 

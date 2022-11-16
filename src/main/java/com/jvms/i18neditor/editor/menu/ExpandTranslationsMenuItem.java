@@ -11,7 +11,7 @@ import javax.swing.*;
  * @author Jacob van Mourik
  */
 public class ExpandTranslationsMenuItem extends JMenuItem {
-    private final static long serialVersionUID = 7316102121075733726L;
+    private static final long serialVersionUID = 7316102121075733726L;
 
     public ExpandTranslationsMenuItem(TranslationTree tree) {
         super(MessageBundle.get("menu.view.expand.title"));

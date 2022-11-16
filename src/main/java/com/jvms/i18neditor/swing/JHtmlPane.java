@@ -10,7 +10,7 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class JHtmlPane extends JEditorPane {
-    private final static long serialVersionUID = 2873290055720408299L;
+    private static final long serialVersionUID = 2873290055720408299L;
 
     public JHtmlPane(Component parent, String content) {
         super("text/html", content);

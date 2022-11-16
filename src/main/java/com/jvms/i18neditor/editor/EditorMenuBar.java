@@ -1,7 +1,6 @@
 package com.jvms.i18neditor.editor;
 
 import com.jvms.i18neditor.FileStructure;
-import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.editor.menu.*;
 import com.jvms.i18neditor.swing.util.Dialogs;
 import com.jvms.i18neditor.util.GithubRepoUtil;
@@ -25,7 +24,7 @@ import static javax.swing.JOptionPane.DEFAULT_OPTION;
  * @author Jacob van Mourik
  */
 public class EditorMenuBar extends JMenuBar {
-    private final static long serialVersionUID = -101788804096708514L;
+    private static final long serialVersionUID = -101788804096708514L;
 
     private final Editor editor;
     private final TranslationTree tree;
@@ -105,7 +104,7 @@ public class EditorMenuBar extends JMenuBar {
             for (int i = 0; i < items.size(); i++) {
                 Integer n = i + 1;
                 JMenuItem menuItem = new JMenuItem(n + ": " + items.get(i), Character.forDigit(i, 10));
-                Path path = Paths.get(menuItem.getText().replaceFirst("[0-9]+: ", ""));
+                Path path = Paths.get(menuItem.getText().replaceFirst("\\d+: ", ""));
                 menuItem.addActionListener(e -> editor.importProject(path,null));
                 openRecentMenuItem.add(menuItem);
             }
@@ -203,19 +202,17 @@ public class EditorMenuBar extends JMenuBar {
         settingsMenu.setMnemonic(MessageBundle.getMnemonic("menu.settings.vk"));
 
         editorSettingsMenuItem = new JMenuItem(MessageBundle.get("menu.settings.preferences.editor.title"));
-        editorSettingsMenuItem.addActionListener(e -> {
+        editorSettingsMenuItem.addActionListener(e ->
             Dialogs.showComponentDialog(editor,
                     MessageBundle.get("dialogs.preferences.editor.title"),
-                    new EditorSettingsPane(editor));
-        });
+                    new EditorSettingsPane(editor))
+        );
 
         projectSettingsMenuItem = new JMenuItem(MessageBundle.get("menu.settings.preferences.project.title"));
 
 
         projectSettingsMenuItem.addActionListener(e -> {
-           /* Dialogs.showComponentDialog(editor,
-                    MessageBundle.get("dialogs.preferences.project.title"),
-                    new EditorProjectSettingsPane(editor));*/
+
             FileStructure before = editor.getProject().getResourceFileStructure();
             int result = JOptionPane.showOptionDialog(editor,  new EditorProjectSettingsPane(editor), MessageBundle.get("dialogs.preferences.project.title"), DEFAULT_OPTION,
                     JOptionPane.PLAIN_MESSAGE, null, null, null);

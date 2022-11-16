@@ -1,11 +1,10 @@
 package com.jvms.i18neditor.editor;
 
-import com.jvms.i18neditor.swing.util.Dialogs;
-import com.jvms.i18neditor.util.MessageBundle;
+
 import com.jvms.i18neditor.util.ResourceKeys;
 import com.jvms.i18neditor.util.TypeFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -21,16 +20,15 @@ import java.util.stream.Collectors;
  * @author Jacob van Mourik
  */
 public class TranslationTreeNode extends DefaultMutableTreeNode {
-    private final static Logger log = LoggerFactory.getLogger(Editor.class);
-    private final static long serialVersionUID = -7372403592538358822L;
+
+    private static final long serialVersionUID = -7372403592538358822L;
     private String name;
     private boolean error;
-    public TypeFile typeFile = TypeFile.JSON;
+    private TypeFile typeFile = TypeFile.JSON;
 
-    private void showError(String message) {
-        Dialogs.showErrorDialog(null, MessageBundle.get("dialogs.error.title"), message);
+    public TypeFile getTypeFile() {
+        return typeFile;
     }
-
 
     public TranslationTreeNode(String name, TypeFile typeFile) {
         this.typeFile = typeFile;
@@ -51,7 +49,7 @@ public class TranslationTreeNode extends DefaultMutableTreeNode {
     public TranslationTreeNode(String name, List<String> keys) {
         super();
         this.name = name;
-        if (ResourceKeys.uniqueRootKeys(keys).size() == 0) {
+        if (ResourceKeys.uniqueRootKeys(keys).isEmpty()) {
             this.typeFile = TypeFile.ELEMENT;
         }
 
@@ -86,7 +84,7 @@ public class TranslationTreeNode extends DefaultMutableTreeNode {
         List<TreeNode> path = Arrays.asList(getPath());
         List<String> parts = path.stream()
                 .filter(p -> !((TranslationTreeNode) p).isRoot())
-                .map(p -> p.toString())
+                .map(Object::toString)
                 .collect(Collectors.toList());
 
         return ResourceKeys.create(parts);

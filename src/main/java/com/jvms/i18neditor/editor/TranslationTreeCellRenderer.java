@@ -15,9 +15,9 @@ import java.util.HashMap;
  * @author Jacob van Mourik
  */
 public class TranslationTreeCellRenderer extends DefaultTreeCellRenderer {
-    private final static long serialVersionUID = 3511394180407171920L;
-    private final static ImageIcon JSON_ICON = Images.loadFromClasspath("images/json.png");
-    private final static ImageIcon FOLDER_ICON = Images.loadFromClasspath("images/icon-folder.png");
+    private static final long serialVersionUID = 3511394180407171920L;
+    private static final ImageIcon JSON_ICON = Images.loadFromClasspath("images/json.png");
+    private static final ImageIcon FOLDER_ICON = Images.loadFromClasspath("images/icon-folder.png");
     private final Color selectionBackground;
 
     public TranslationTreeCellRenderer() {
@@ -46,13 +46,13 @@ public class TranslationTreeCellRenderer extends DefaultTreeCellRenderer {
         l.setForeground(tree.getForeground());
         l.setBackground(tree.getBackground());
         if (!node.isRoot() && (node.hasError() || model.hasErrorChildNode(node))) {
-            l.setIcon(new TranslationTreeStatusIcon(TranslationTreeStatusIcon.StatusIconType.Warning));
+            l.setIcon(new TranslationTreeStatusIcon(TranslationTreeStatusIcon.StatusIconType.WARNING));
         }
         HashMap<TypeFile, ImageIcon> type = new HashMap<>();
         type.put(TypeFile.FOLDER, FOLDER_ICON);
         type.put(TypeFile.JSON, JSON_ICON);
         type.put(TypeFile.ELEMENT, null);
-        l.setIcon(type.get(node.typeFile));
+        l.setIcon(type.get(node.getTypeFile()));
 
 
         if (selected) {

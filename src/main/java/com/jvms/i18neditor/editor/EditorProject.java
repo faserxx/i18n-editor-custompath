@@ -85,7 +85,7 @@ public class EditorProject {
     }
 
     public boolean supportsResourceParentValues() {
-        return resourceType == ResourceType.Properties;
+        return resourceType == ResourceType.PROPERTIES;
     }
 
     public FileStructure getResourceFileStructure() {

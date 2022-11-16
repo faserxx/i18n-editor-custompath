@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
  * @author Jacob van Mourik
  */
 public final class Locales {
-    public final static String LOCALE_REGEX = "([^_-]*)(?:[_-]([^_-]*)(?:[_-]([^_-]*))?)?";
-    public final static Pattern LOCALE_PATTERN = Pattern.compile(LOCALE_REGEX);
+    public static final String LOCALE_REGEX = "([^_-]*)(?:[_-]([^_-]*)(?:[_-]([^_-]*))?)?";
+    public static final Pattern LOCALE_PATTERN = Pattern.compile(LOCALE_REGEX);
 
     public static Locale parseLocale(String localeString) {
         if (Strings.isNullOrEmpty(localeString)) {

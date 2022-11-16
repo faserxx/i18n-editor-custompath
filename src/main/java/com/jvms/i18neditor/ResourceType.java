@@ -10,7 +10,7 @@ package com.jvms.i18neditor;
 public enum ResourceType {
     JSON(".json"),
     ES6(".js"),
-    Properties(".properties");
+    PROPERTIES(".properties");
 
     private final String extension;
 

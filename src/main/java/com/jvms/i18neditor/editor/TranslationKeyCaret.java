@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 
 public class TranslationKeyCaret extends BlinkCaret {
-    private final static long serialVersionUID = -4481421558690248419L;
+    private static final long serialVersionUID = -4481421558690248419L;
 
     @Override
     public void mouseClicked(MouseEvent e) {

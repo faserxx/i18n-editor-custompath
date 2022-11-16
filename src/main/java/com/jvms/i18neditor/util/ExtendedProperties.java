@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
  * @author Jacob van Mourik
  */
 public class ExtendedProperties extends Properties {
-    private final static long serialVersionUID = 6042931434040718478L;
-    private final static Logger log = LoggerFactory.getLogger(ExtendedProperties.class);
+    private static final long serialVersionUID = 6042931434040718478L;
+    private static final Logger log = LoggerFactory.getLogger(ExtendedProperties.class);
     private final String listSeparator;
 
     /**
@@ -296,7 +296,7 @@ public class ExtendedProperties extends Properties {
      * as determined by the equals method; false otherwise.
      */
     public boolean containsKeys(String... keys) {
-        return Arrays.asList(keys).stream().allMatch(k -> containsKey(k));
+        return Arrays.asList(keys).stream().allMatch(this::containsKey);
     }
 
     @Override

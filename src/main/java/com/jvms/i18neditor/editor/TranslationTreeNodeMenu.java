@@ -14,12 +14,12 @@ import javax.swing.*;
  * @author Jacob van Mourik
  */
 public class TranslationTreeNodeMenu extends JPopupMenu {
-    private final static long serialVersionUID = -8450484152294368841L;
+    private static final long serialVersionUID = -8450484152294368841L;
 
     public TranslationTreeNodeMenu(Editor editor, TranslationTreeNode node) {
         super();
         add(new AddTranslationMenuItem(editor, node, true));
-        if (node.typeFile != TypeFile.FOLDER || node.isRoot()) {
+        if (node.getTypeFile() != TypeFile.FOLDER || node.isRoot()) {
             addSeparator();
             add(new RenameTranslationMenuItem(editor, true));
             add(new RemoveTranslationMenuItem(editor, true));

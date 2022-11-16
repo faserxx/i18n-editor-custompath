@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class ChangePathFolderProjectMenuItem extends JMenuItem {
-    private final static long serialVersionUID = -907122077814626287L;
+    private static final long serialVersionUID = -907122077814626287L;
 
     public ChangePathFolderProjectMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.edit.change.path.folder"));

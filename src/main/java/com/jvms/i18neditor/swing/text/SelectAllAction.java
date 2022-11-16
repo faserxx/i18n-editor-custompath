@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  * @author Jacob van Mourik
  */
 public class SelectAllAction extends TextAction {
-    private final static long serialVersionUID = -4913270947629733919L;
+    private static final long serialVersionUID = -4913270947629733919L;
 
     public SelectAllAction(String name) {
         super(name);

@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class RestoreToDefaultMenuItem extends JMenuItem {
-    private final static long serialVersionUID = -907122077814626281L;
+    private static final long serialVersionUID = -907122077814626281L;
 
     public RestoreToDefaultMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.settings.restore.default"));

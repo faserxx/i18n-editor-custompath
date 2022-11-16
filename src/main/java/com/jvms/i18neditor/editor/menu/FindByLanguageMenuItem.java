@@ -18,12 +18,11 @@ import com.jvms.i18neditor.util.MessageBundle;
  * @author arianna
  */
 public class FindByLanguageMenuItem extends JMenuItem {
-    
-    private final static long serialVersionUID = -1298283182489578961L;
+
+    private static final long serialVersionUID = -1298283182489578961L;
     public FindByLanguageMenuItem(Editor editor, boolean enabled) {
 		super(MessageBundle.get("dialogs.translation.language.find.title"));
-		//setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        addActionListener(e -> editor.showFindByLanguageDialog());
+		addActionListener(e -> editor.showFindByLanguageDialog());
         setEnabled(enabled);
 	}
 }

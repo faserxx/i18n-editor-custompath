@@ -1,7 +1,6 @@
 package com.jvms.i18neditor.editor;
 
-import com.jvms.i18neditor.swing.JHelpLabel;
-import com.jvms.i18neditor.swing.JTextField;
+
 import com.jvms.i18neditor.util.MessageBundle;
 import org.apache.commons.lang3.LocaleUtils;
 
@@ -9,8 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -20,7 +17,7 @@ import java.util.Objects;
  * @author Jacob van Mourik
  */
 public class EditorSettingsPane extends AbstractSettingsPane {
-    private final static long serialVersionUID = 4488173853564278813L;
+    private static final long serialVersionUID = 4488173853564278813L;
     private final Editor editor;
 
     public EditorSettingsPane(Editor editor) {
@@ -56,9 +53,9 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         JLabel languageListLabel = new JLabel(MessageBundle.get("settings.language.title"));
         JComboBox languageListField = new JComboBox(localeComboBoxItems.toArray());
         languageListField.setSelectedItem(currentLocaleItem);
-        languageListField.addActionListener(e -> {
-            settings.setEditorLanguage(((ComboBoxLocale) languageListField.getSelectedItem()).getLocale());
-        });
+        languageListField.addActionListener(e ->
+            settings.setEditorLanguage(((ComboBoxLocale) languageListField.getSelectedItem()).getLocale())
+        );
         languageListPanel.add(languageListLabel);
         languageListPanel.add(languageListField);
         fieldset1.add(languageListPanel, createVerticalGridBagConstraints());
@@ -77,10 +74,10 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         JLabel fileStructureLabel = new JLabel(MessageBundle.get("settings.filestructure.title"));
         JComboBox fileStructureField = new JComboBox(fileStructureComboBoxItems.toArray());
         fileStructureField.setSelectedItem(currentFileStructureItem);
-        fileStructureField.addActionListener(e -> {
-                        settings.setResourceFileStructure(((ComboBoxFileStructure) Objects.requireNonNull(fileStructureField.getSelectedItem())).getStructure());
+        fileStructureField.addActionListener(e ->
+                        settings.setResourceFileStructure(((ComboBoxFileStructure) Objects.requireNonNull(fileStructureField.getSelectedItem())).getStructure())
 
-        });
+        );
         fileStructurePanel.add(fileStructureLabel);
         fileStructurePanel.add(fileStructureField);
         fieldset2.add(fileStructurePanel, createVerticalGridBagConstraints());
@@ -139,10 +136,5 @@ public class EditorSettingsPane extends AbstractSettingsPane {
         add(fieldset3, createVerticalGridBagConstraints());
     }
 
-    ActionListener actionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            System.out.println(e);
-        }
-    };
+
 }

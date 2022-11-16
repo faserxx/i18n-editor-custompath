@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,9 +22,9 @@ import java.util.concurrent.Future;
  * @author Jacob van Mourik
  */
 public final class GithubRepoUtil {
-    private final static Logger log = LoggerFactory.getLogger(GithubRepoUtil.class);
-    private final static Gson gson = new Gson();
-    private final static ExecutorService executor;
+    private static final Logger log = LoggerFactory.getLogger(GithubRepoUtil.class);
+    private static final Gson gson = new Gson();
+    private static final ExecutorService executor;
 
     static {
         executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
@@ -55,7 +56,7 @@ public final class GithubRepoUtil {
             URL url = new URL("https://api.github.com/repos/" + username + "/" + project + "/releases/latest");
             try {
                 connection = (HttpURLConnection) url.openConnection();
-                try (InputStreamReader reader = new InputStreamReader(connection.getInputStream(), Charsets.UTF_8)) {
+                try (InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)) {
                     return gson.fromJson(reader, GithubRepoReleaseData.class);
                 }
             } catch (IOException e) {

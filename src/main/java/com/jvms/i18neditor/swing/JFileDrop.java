@@ -286,7 +286,7 @@ public class JFileDrop {
                         // Is it a file list?
                         if (tr.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor)) {
                             // Say we'll take it.
-                            //evt.acceptDrop ( java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE );
+
                             evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
                             log(out, "FileDrop: file list accepted.");
 
@@ -691,7 +691,7 @@ public class JFileDrop {
          *
          * @since 1.1
          */
-        public final static String MIME_TYPE = "application/x-net.iharder.dnd.TransferableObject";
+        public static final String MIME_TYPE = "application/x-net.iharder.dnd.TransferableObject";
 
 
         /**
@@ -703,7 +703,7 @@ public class JFileDrop {
          *
          * @since 1.1
          */
-        public final static java.awt.datatransfer.DataFlavor DATA_FLAVOR =
+        public static final java.awt.datatransfer.DataFlavor DATA_FLAVOR =
                 new java.awt.datatransfer.DataFlavor(JFileDrop.TransferableObject.class, MIME_TYPE);
 
 
@@ -843,11 +843,9 @@ public class JFileDrop {
                 return true;
 
             // String
-            if (flavor.equals(java.awt.datatransfer.DataFlavor.stringFlavor))
-                return true;
+            return flavor.equals(DataFlavor.stringFlavor);
 
             // We can't do anything else
-            return false;
         }   // end isDataFlavorSupported
 
 

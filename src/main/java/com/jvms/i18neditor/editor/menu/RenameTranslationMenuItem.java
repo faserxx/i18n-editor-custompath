@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class RenameTranslationMenuItem extends JMenuItem {
-    private final static long serialVersionUID = 907122077814626286L;
+    private static final long serialVersionUID = 907122077814626286L;
 
     public RenameTranslationMenuItem(Editor editor, boolean enabled) {
         super(MessageBundle.get("menu.edit.rename.title"));

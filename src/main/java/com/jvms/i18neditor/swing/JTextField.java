@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class JTextField extends javax.swing.JTextField {
-    private final static long serialVersionUID = 5296894112638304738L;
+    private static final long serialVersionUID = 5296894112638304738L;
     protected final UndoManager undoManager = new UndoManager();
 
     /**

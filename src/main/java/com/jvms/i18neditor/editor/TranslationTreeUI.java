@@ -13,8 +13,8 @@ import java.awt.*;
  * @author Jacob van Mourik
  */
 public class TranslationTreeUI extends BasicTreeUI {
-    private final TranslationTreeToggleIcon expandedIcon = new TranslationTreeToggleIcon(ToggleIconType.Expanded);
-    private final TranslationTreeToggleIcon collapsedIcon = new TranslationTreeToggleIcon(ToggleIconType.Collapsed);
+    private final TranslationTreeToggleIcon expandedIcon = new TranslationTreeToggleIcon(ToggleIconType.EXPANDED);
+    private final TranslationTreeToggleIcon collapsedIcon = new TranslationTreeToggleIcon(ToggleIconType.COLLAPSED);
 
     @Override
     protected void toggleExpandState(TreePath path) {
@@ -23,6 +23,7 @@ public class TranslationTreeUI extends BasicTreeUI {
 
     @Override
     protected void paintVerticalLine(Graphics g, JComponent c, int y, int left, int right) {
+
     }
 
     @Override

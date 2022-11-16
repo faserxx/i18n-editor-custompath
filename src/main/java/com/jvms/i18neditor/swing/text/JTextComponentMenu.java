@@ -17,7 +17,7 @@ import java.awt.event.KeyEvent;
  * @author Jacob van Mourik
  */
 public class JTextComponentMenu extends JPopupMenu {
-    private final static long serialVersionUID = 5967213965940023534L;
+    private static final long serialVersionUID = 5967213965940023534L;
     private final JTextComponent parent;
     private final UndoManager undoManager;
     private final Action cutAction;

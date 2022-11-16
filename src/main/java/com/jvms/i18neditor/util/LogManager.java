@@ -32,8 +32,7 @@ public class LogManager {
             String typeOperation = operation(params.getTypeOperation());
             StringBuilder sbLine = new StringBuilder();
             sbLine.append(time.format(formatter)).append(" ---> ").append(params.getPathTranslationFile()).append(" ---> ").append(typeOperation).append(" ---> ").append(params.getMessage());
-            //String fileLog = params.getPathLogFile().isEmpty() ? System.getProperty("user.dir") + nameFileLog : params.getPathLogFile() + nameFileLog;
-            
+
             Path path =   Paths.get(Editor.SETTINGS_DIR, "log.txt");
             if ( !path.toFile().exists())
                 path.toFile().createNewFile();

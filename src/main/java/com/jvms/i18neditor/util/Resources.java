@@ -9,7 +9,8 @@ import com.jvms.i18neditor.Resource;
 import com.jvms.i18neditor.ResourceType;
 import com.jvms.i18neditor.io.ChecksumException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,11 +32,11 @@ import java.util.stream.Collectors;
  * @author Jacob van Mourik
  */
 public final class Resources {
-    private final static Charset UTF8_ENCODING;
-    private final static String FILENAME_LOCALE_REGEX;
+    private static final Charset UTF8_ENCODING;
+    private static final String FILENAME_LOCALE_REGEX;
 
     static {
-        UTF8_ENCODING = Charset.forName("UTF-8");
+        UTF8_ENCODING = StandardCharsets.UTF_8;
         FILENAME_LOCALE_REGEX = Pattern.quote("{") + "(.*)" + Pattern.quote("LOCALE") + "(.*)" + Pattern.quote("}");
     }
 
@@ -104,7 +105,7 @@ public final class Resources {
             }
         }
         }
-        ;
+
 
         return result;
     }
@@ -125,7 +126,7 @@ public final class Resources {
             ResourceType type = resource.getType();
             Path path = resource.getPath();
             SortedMap<String, String> translations;
-            if (type == ResourceType.Properties) {
+            if (type == ResourceType.PROPERTIES) {
                 ExtendedProperties content = new ExtendedProperties();
                 content.load(path);
                 translations = fromProperties(content);
@@ -172,7 +173,7 @@ public final class Resources {
         }
 
         ResourceType type = resource.getType();
-        if (type == ResourceType.Properties) {
+        if (type == ResourceType.PROPERTIES) {
             ExtendedProperties content = toProperties(resource.getTranslations());
 
            content.store(resource.getPath());
@@ -237,9 +238,9 @@ public final class Resources {
 
     private static SortedMap<String, String> fromProperties(Properties properties) {
         SortedMap<String, String> result = Maps.newTreeMap();
-        properties.forEach((key, value) -> {
-            result.put((String) key, StringEscapeUtils.unescapeJava((String) value));
-        });
+        properties.forEach((key, value) ->
+            result.put((String) key, StringEscapeUtils.unescapeJava((String) value))
+        );
         return result;
     }
 
@@ -306,7 +307,7 @@ public final class Resources {
 
     private static JsonElement toFlatJson(Map<String, String> translations, List<String> keys) {
         JsonObject object = new JsonObject();
-        if (keys.size() > 0) {
+        if (!keys.isEmpty()) {
             translations.forEach((k, v) -> {
                 if (!Strings.isNullOrEmpty(translations.get(k))) {
                     object.add(k, new JsonPrimitive(translations.get(k)));
@@ -317,7 +318,7 @@ public final class Resources {
     }
 
     private static JsonElement toJson(Map<String, String> translations, String key, List<String> keys) {
-        if (keys.size() > 0) {
+        if (!keys.isEmpty()) {
             JsonObject object = new JsonObject();
             ResourceKeys.uniqueRootKeys(keys).forEach(rootKey -> {
                 String subKey = ResourceKeys.create(key, rootKey);
@@ -357,12 +358,12 @@ public final class Resources {
                 digest.update(buffer, 0, bytesRead);
             }
         }
-        String result = "";
+        StringBuilder result = new StringBuilder();
         byte[] bytes = digest.digest();
         for (int i = 0; i < bytes.length; i++) {
-            result += Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1);
+            result.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
         }
-        return result;
+        return result.toString();
     }
 
     private static boolean matchesResourceType(Path path, ResourceType type) {
