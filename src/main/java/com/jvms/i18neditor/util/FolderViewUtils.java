@@ -137,8 +137,7 @@ public class FolderViewUtils {
         //If is directory iterate for the childs
         if (node.isDirectory()) {
             for (File child : Objects.requireNonNull(node.listFiles())) {
-
-                //If is is a directory and not contain i18n (because we analixed that before ) create a structure recursively
+               //If is is a directory and not contain i18n (because we analixed that before ) create a structure recursively
                 if (child.isDirectory() && !child.getName().equals("i18n")) {
                     Pair<Boolean, TranslationTreeNode> createDir = createTreeByDir(project, editor, child, dirLanguage);
                     TranslationTreeNode noda = createDir.second;
@@ -149,9 +148,13 @@ public class FolderViewUtils {
                     if (noda == null) {
                         return null;
                     }
+                  List<TranslationTreeNode> listChildren=  noda.getChildren();
+                  if(!listChildren.isEmpty())
+                 {
                     ret.add(noda);
+                  } 
                 }
-
+                //}
 
             }
 
